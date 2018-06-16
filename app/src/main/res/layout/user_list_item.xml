@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginBottom="1dp"
+    android:background="@android:color/white">
+
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/user_image_list"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:src="@drawable/thumb_default_image"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/user_name_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="@+id/user_image_list"
+        app:layout_constraintStart_toEndOf="@+id/user_image_list"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Mama" />
+
+    <TextView
+        android:id="@+id/user_status_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@+id/user_name_list"
+        app:layout_constraintTop_toBottomOf="@+id/user_name_list"
+        tools:text="نبتنيتبنتيبتب" />
+
+    <ImageView
+        android:id="@+id/online_icon"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="7dp"
+        android:src="@drawable/online_icon"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/user_name_list"
+        app:layout_constraintStart_toEndOf="@+id/user_name_list"
+        app:layout_constraintTop_toTopOf="@+id/user_name_list" />
+
+
+
+
+
+
+</android.support.constraint.ConstraintLayout>

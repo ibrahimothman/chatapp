@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.ChatActivity"
+    android:background="@color/chat_background">
+
+    <include layout="@layout/toolbar_layout" android:id="@+id/toolbar"/>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_below="@+id/toolbar"
+        android:layout_above="@+id/send_message_layout">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/messages_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/send_message_layout">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:background="@drawable/ic_image_black_24dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="5dp"
+            android:textColor="@color/colorPrimary"
+            android:id="@+id/take_image_btn"
+
+            />
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_weight="6"
+            android:layout_height="wrap_content"
+            android:hint="send a message"
+            tools:text="hello ya hobby"
+            android:id="@+id/message_edit_text"
+            android:padding="20dp"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="send"
+            android:background="@null"
+            android:padding="0dp"
+            android:textColor="@color/colorPrimary"
+            android:id="@+id/send_message_btn"
+            />
+
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "489956199073",
+    "firebase_url": "https://chatappdemo-b47f9.firebaseio.com",
+    "project_id": "chatappdemo-b47f9",
+    "storage_bucket": "chatappdemo-b47f9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:489956199073:android:f7ef0c1c6869a443",
+        "android_client_info": {
+          "package_name": "com.ibra.chatappdemo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "489956199073-qjbop6ukgfrs9bov9tiknni3fnosmn4o.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "489956199073-qjbop6ukgfrs9bov9tiknni3fnosmn4o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCquxafdmquwUOLG3aRzzskh5GhVYryg_0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

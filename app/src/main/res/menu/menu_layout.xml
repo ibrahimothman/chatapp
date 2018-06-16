@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+    <item android:title="@string/setting_activity"
+        android:id="@+id/setting_option"
+        android:orderInCategory="1"/>
+
+    <item android:title="All users"
+        android:id="@+id/allusers_option"
+        android:orderInCategory="2"/>
+
+    <item android:title="sign out"
+        android:id="@+id/signout_option"
+        android:orderInCategory="3"/>
+
+
+</menu>
