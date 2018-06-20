@@ -78,6 +78,13 @@
 
         <service android:name=".widget.ChatWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS"/>
+
+        <service
+            android:name=".service.jobDispatcher">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

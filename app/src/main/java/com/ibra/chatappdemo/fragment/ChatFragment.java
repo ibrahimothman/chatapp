@@ -168,6 +168,9 @@ public class ChatFragment extends Fragment {
             };
             chatList.setAdapter(adapter);
 
+
+
+
         }
 
 

@@ -20,6 +20,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,6 +36,7 @@ import com.ibra.chatappdemo.fragment.FreindFragment;
 import com.ibra.chatappdemo.fragment.RequestFragment;
 import com.ibra.chatappdemo.listener.IntefaceListener;
 import com.ibra.chatappdemo.preferenceManage.SharedPreferenceStart;
+import com.ibra.chatappdemo.service.NotificationReminder;
 import com.ibra.chatappdemo.widget.ChatWidgetRemoteFactory;
 
 import java.text.DateFormat;
@@ -62,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements IntefaceListener.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       
 
         prefStart = new SharedPreferenceStart(this);
         Log.d(TAG,"statusIs "+prefStart.isFirstTime_app());
@@ -97,6 +100,12 @@ public class MainActivity extends AppCompatActivity implements IntefaceListener.
         if (intent != null && intent.getStringExtra(ChatWidgetRemoteFactory.WIDGET_EXTRA) != null){
             mViewPager.setCurrentItem(2);
         }
+
+
+
+
+        // start job dispatcher
+        NotificationReminder.scheduleChargingReminder(this);
     }
 
     @Override

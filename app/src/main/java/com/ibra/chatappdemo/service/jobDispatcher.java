@@ -4,40 +4,33 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.job.JobParameters;
+
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
-import com.google.firebase.messaging.FirebaseMessagingService;
-import com.google.firebase.messaging.RemoteMessage;
+import com.firebase.jobdispatcher.JobService;
 import com.ibra.chatappdemo.R;
-import com.ibra.chatappdemo.ui.AllusersActivity;
 import com.ibra.chatappdemo.ui.MainActivity;
 
-public class FirebaseMessageService extends FirebaseMessagingService {
+public class jobDispatcher extends JobService {
 
-    private static final String CHANNEL_ID = "NOTIFICATION_CHANNEL_ID";
-    private static final int WATER_REMINDER_NOTIFICATION_ID = 55;
-    private static final int WATER_REMINDER_PENDING_INTENT_ID = 66;
-    private int notificationId = (int) System.currentTimeMillis();
+
+    private static final int WATER_REMINDER_NOTIFICATION_ID = 11;
+    private static final int WATER_REMINDER_PENDING_INTENT_ID = 22;
+    private static String  CHANNEL_ID = "NOTIFICATION_CHANNEL_ID";
+
+
+
 
     @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
-        super.onMessageReceived(remoteMessage);
-
-        Log.d("fromservice","inside");
-
-        String title = remoteMessage.getNotification().getTitle();
-        String message = remoteMessage.getNotification().getBody();
-        String action = remoteMessage.getNotification().getClickAction();
-        String from_user_id = remoteMessage.getData().get("from_user_id");
-
+    public boolean onStartJob(com.firebase.jobdispatcher.JobParameters job) {
         NotificationManager notificationManager = (NotificationManager)
                 getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -48,33 +41,40 @@ public class FirebaseMessageService extends FirebaseMessagingService {
             notificationManager.createNotificationChannel(mChannel);
         }
 
-        Intent intent = new Intent(action);
-        intent.putExtra(AllusersActivity.USER_ID_EXTRA,from_user_id);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this,CHANNEL_ID)
-                .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(),CHANNEL_ID)
+                .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
                 .setSmallIcon(R.drawable.ic_launcher_background)
-                .setContentTitle(title)
-                .setContentText(message)
+                .setContentTitle(getApplicationContext().getString(R.string.charging_reminder_notification_title))
+                .setContentText(getApplicationContext().getString(R.string.charging_reminder_notification_body))
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(
-                        getString(R.string.charging_reminder_notification_body)))
+                        getApplicationContext().getString(R.string.charging_reminder_notification_body)))
                 .setDefaults(Notification.DEFAULT_VIBRATE)
-                .setContentIntent(pendingIntent)
+                .setContentIntent(contentIntent(getApplicationContext()))
                 .setSound(alarmSound)
                 .setAutoCancel(true);
-
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
                 && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
         }
         notificationManager.notify(WATER_REMINDER_NOTIFICATION_ID, notificationBuilder.build());
+        return false;
+    }
 
+    @Override
+    public boolean onStopJob(com.firebase.jobdispatcher.JobParameters job) {
+        return false;
     }
 
 
+    private PendingIntent contentIntent(Context context) {
+        Intent startActivityIntent = new Intent(context, MainActivity.class);
+        return PendingIntent.getActivity(
+                context,
+                WATER_REMINDER_PENDING_INTENT_ID,
+                startActivityIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+    }
 }

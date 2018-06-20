@@ -3,6 +3,7 @@ package com.ibra.chatappdemo.model;
 public class Request {
 
     private String request_type;
+    //kasjdksajdkjaskljdlk
 
     public Request(String request_type) {
         this.request_type = request_type;
