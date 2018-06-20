@@ -102,7 +102,13 @@ public class MainActivity extends AppCompatActivity implements IntefaceListener.
         }
 
 
+        // initialize ads
+        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
 
+        // load banner ads
+        AdView mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         // start job dispatcher
         NotificationReminder.scheduleChargingReminder(this);
