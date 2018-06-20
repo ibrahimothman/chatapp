@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.ibra.chatappdemo.R;
 import com.ibra.chatappdemo.model.User;
 import com.ibra.chatappdemo.preferenceManage.SharedPreferenceStart;
@@ -186,6 +187,8 @@ View.OnFocusChangeListener{
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
+                    String deviceToken = FirebaseInstanceId.getInstance().getToken();
+                    FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid()).child("device_token").setValue(deviceToken);
                     launchMainActivity();
                 } else
                     Toast.makeText(RegisterActivity.this, getString(R.string.register_error), Toast.LENGTH_SHORT).show();

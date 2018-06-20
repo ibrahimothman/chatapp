@@ -24,7 +24,7 @@ public class jobDispatcher extends JobService {
 
     private static final int WATER_REMINDER_NOTIFICATION_ID = 11;
     private static final int WATER_REMINDER_PENDING_INTENT_ID = 22;
-    private static String  CHANNEL_ID = "NOTIFICATION_CHANNEL_ID";
+
 
 
 
@@ -33,17 +33,11 @@ public class jobDispatcher extends JobService {
     public boolean onStartJob(com.firebase.jobdispatcher.JobParameters job) {
         NotificationManager notificationManager = (NotificationManager)
                 getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel mChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    getApplicationContext().getString(R.string.main_notification_channel_name),
-                    NotificationManager.IMPORTANCE_HIGH);
-            notificationManager.createNotificationChannel(mChannel);
-        }
+
 
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(),CHANNEL_ID)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext())
                 .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
                 .setSmallIcon(R.drawable.ic_launcher_background)
                 .setContentTitle(getApplicationContext().getString(R.string.charging_reminder_notification_title))

@@ -180,59 +180,65 @@ public class MainActivity extends AppCompatActivity implements IntefaceListener.
 
     @Override
     public void onAcceptRequest(String currentId, String friendId) {
+        Log.d("fromMainActivity","inside accept");
+        if (friendId != null && currentId != null) {
+            Log.d("fromMainActivity","inside accept two ids not null");
+            DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.notification_table))
+                    .child(friendId).push();
+            String notificationId = notificationRef.getKey();
+            final String current_date = DateFormat.getDateTimeInstance().format(new Date());
 
-        DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.notification_table))
-                .child(friendId).push();
-        String notificationId = notificationRef.getKey();
-        final String current_date = DateFormat.getDateTimeInstance().format(new Date());
+            Map<String, Object> friendMap = new HashMap();
 
-        Map<String,Object> friendMap = new HashMap();
+            // first remove request friend
+            friendMap.put(getString(R.string.friend_req_table) + "/" + currentId + "/" + friendId + "/" +
+                    getString(R.string.request_type), null);
+            friendMap.put(getString(R.string.friend_req_table) + "/" + friendId + "/" + currentId + "/" +
+                    getString(R.string.request_type), null);
 
-        // first remove request friend
-        friendMap.put(getString(R.string.friend_req_table)+"/"+currentId+"/"+friendId+"/"+
-                getString(R.string.request_type),null);
-        friendMap.put(getString(R.string.friend_req_table)+"/"+friendId+"/"+currentId+"/"+
-                getString(R.string.request_type),null);
+            // add to friends table
+            friendMap.put(getString(R.string.friends_table) + "/" + currentId + "/" + friendId + "/date", current_date);
+            friendMap.put(getString(R.string.friends_table) + "/" + friendId + "/" + currentId + "/date", current_date);
 
-        // add to friends table
-        friendMap.put(getString(R.string.friends_table)+"/"+currentId+"/"+friendId+"/date",current_date);
-        friendMap.put(getString(R.string.friends_table)+"/"+friendId+"/"+currentId+"/date",current_date);
+            friendMap.put(getString(R.string.notification_table) + "/" + friendId + "/" + notificationId + "/" + "from", currentId);
+            friendMap.put(getString(R.string.notification_table) + "/" + friendId + "/" + notificationId + "/" + "not_type", "accept");
 
-        friendMap.put(getString(R.string.notification_table)+"/"+friendId+"/"+notificationId+"/"+"from",currentId);
-        friendMap.put(getString(R.string.notification_table)+"/"+friendId+"/"+notificationId+"/"+"not_type","accept");
+            rootRef.updateChildren(friendMap, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if (databaseError != null) {
+                        Toast.makeText(MainActivity.this, getString(R.string.error_msg), Toast.LENGTH_LONG).show();
+                    } else {
 
-        rootRef.updateChildren(friendMap, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                if(databaseError != null){
-                    Toast.makeText(MainActivity.this, getString(R.string.error_msg), Toast.LENGTH_LONG).show();
-                }else{
+                        Toast.makeText(MainActivity.this, getString(R.string.friend_acceptance), Toast.LENGTH_LONG).show();
+                    }
 
-                    Toast.makeText(MainActivity.this, getString(R.string.friend_acceptance), Toast.LENGTH_LONG).show();
                 }
-
-            }
-        });
+            });
+        }else Log.d("fromMainActivity","inside accept two ids are null");
     }
 
     @Override
     public void onDeclineRequest(String currentId, String friendId) {
-        Map<String,Object> declineMap = new HashMap();
-        declineMap.put(getString(R.string.friend_req_table)+"/"+currentId+"/"+friendId+"/"+
-                getString(R.string.request_type),null);
-        declineMap.put(getString(R.string.friend_req_table)+"/"+friendId+"/"+currentId+"/"+
-                getString(R.string.request_type),null);
 
-        rootRef.updateChildren(declineMap, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                if(databaseError != null){
+        if (friendId != null && currentId != null) {
+            Map<String, Object> declineMap = new HashMap();
+            declineMap.put(getString(R.string.friend_req_table) + "/" + currentId + "/" + friendId + "/" +
+                    getString(R.string.request_type), null);
+            declineMap.put(getString(R.string.friend_req_table) + "/" + friendId + "/" + currentId + "/" +
+                    getString(R.string.request_type), null);
 
-                    Toast.makeText(MainActivity.this, getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(MainActivity.this, getString(R.string.decline_msg), Toast.LENGTH_SHORT).show();
+            rootRef.updateChildren(declineMap, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if (databaseError != null) {
+
+                        Toast.makeText(MainActivity.this, getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, getString(R.string.decline_msg), Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 }

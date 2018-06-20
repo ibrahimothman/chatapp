@@ -2,6 +2,7 @@ package com.ibra.chatappdemo.ui;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -51,6 +52,7 @@ public class ChatActivity extends AppCompatActivity {
     private static final String TAG = ChatActivity.class.getCanonicalName();
     private static final int LIMIT_TO_LAST = 5;
     private static final int PICK_IMAGE = 55;
+    private static final String FINAL_PAGE_NUMBER = "FINAL_PAGE_NUMBER";
     private  int pageNumber = 1;
     private Toolbar mToolbar;
     private TextView nameTxt,lastseenTxt;
@@ -384,5 +386,20 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putInt(FINAL_PAGE_NUMBER,pageNumber);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if(savedInstanceState != null){
+            pageNumber = savedInstanceState.getInt(FINAL_PAGE_NUMBER);
+            Log.d("fromchatactivity","saved not null and page is "+pageNumber);
+        }
     }
 }

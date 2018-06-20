@@ -416,11 +416,14 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void setupToolbar() {
-        mToolbar = (Toolbar)findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        if(!profileUid.equals(currentUid)) getSupportActionBar().setTitle(user.getuName());
-        else getSupportActionBar().setTitle("You");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if(currentUid != null && profileUid != null) {
+            mToolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(mToolbar);
+            if (!profileUid.equals(currentUid)) {
+                getSupportActionBar().setTitle(user.getuName());
+            } else getSupportActionBar().setTitle("You");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     private void updateUi() {

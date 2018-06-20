@@ -28,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.ibra.chatappdemo.R;
+import com.ibra.chatappdemo.adapter.RequestAdapter;
 import com.ibra.chatappdemo.listener.IntefaceListener;
 import com.ibra.chatappdemo.model.Request;
 import com.ibra.chatappdemo.model.User;
@@ -47,10 +48,13 @@ public class RequestFragment extends Fragment  {
     String currentId;
     DatabaseReference requestRef,userRef;
     private String requestId;
-    IntefaceListener.acceptFriendRequest acceptListener;
-    IntefaceListener.declineFriendRequest declineListener;
+
     ConstraintLayout reqItemLayout;
     ArrayList<User> widgetList = new ArrayList<>();
+    RequestAdapter requestAdapter;
+    private String friendId;
+    private ArrayList<User> users = new ArrayList<>();
+
 
     public RequestFragment() {
     }
@@ -60,74 +64,64 @@ public class RequestFragment extends Fragment  {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragemt_request,container,false);
         reqItemLayout = (ConstraintLayout)view.findViewById(R.id.req_list_item_layout);
-//        reqItemLayout.setVisibility(View.INVISIBLE);
 
-        acceptListener = (IntefaceListener.acceptFriendRequest) getActivity();
-        declineListener = (IntefaceListener.declineFriendRequest) getActivity();
+
+
 
         requestList =(RecyclerView) view.findViewById(R.id.request_list);
         requestList.setLayoutManager(new LinearLayoutManager(getContext()));
         requestList.setHasFixedSize(true);
+        requestAdapter = new RequestAdapter(getContext(),users,friendId);
+        requestList.setAdapter(requestAdapter);
 
+
+        userRef = FirebaseDatabase.getInstance().getReference().child("users");
 
         currentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         requestRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.friend_req_table))
                 .child(currentId);
 
-        FirebaseRecyclerAdapter<Request,RequestListHolder> adapter =
-                new FirebaseRecyclerAdapter<Request, RequestListHolder>(
-                        Request.class,R.layout.request_list_item,RequestListHolder.class,requestRef
-                ) {
-                    @Override
-                    protected void populateViewHolder(final RequestListHolder viewHolder, final Request model, int position) {
-                        Log.d("fromreqfrag","type is ");
-                        if(model.getRequest_type() != null) {
-                            if (model.getRequest_type().equals("receive")) {
-
-                                requestId = getRef(position).getKey();
-                                userRef = FirebaseDatabase.getInstance().getReference().child("users").child(requestId);
-                                userRef.addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        if (dataSnapshot != null) {
-                                            User user = dataSnapshot.getValue(User.class);
-
-                                            viewHolder.name.setText(user.getuName());
-                                            Picasso.get().load(user.getuThumb()).placeholder(R.drawable.thumb_default_image).into(viewHolder.image);
-                                            widgetList.add(user);
-                                            saveRequestIntoSharedPref();
-
-                                            viewHolder.confirmBtn.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View view) {
-                                                    acceptListener.onAcceptRequest(currentId, requestId);
-                                                }
-                                            });
-
-                                            viewHolder.declineBtn.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View view) {
-                                                    declineListener.onDeclineRequest(currentId, requestId);
-                                                }
-                                            });
-
-
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
+        requestRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                users.clear();
+                requestAdapter.notifyDataSetChanged();
+                saveRequestIntoSharedPref();
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    if (dataSnapshot != null) {
+                        Request request = data.getValue(Request.class);
+                        if (request.getRequest_type().equals("receive")) {
+                            friendId = data.getKey();
+                            userRef.child(friendId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot != null) {
+                                        User user = dataSnapshot.getValue(User.class);
+                                        users.add(user);
+                                        requestAdapter.notifyAdapter(friendId);
+                                        saveRequestIntoSharedPref();
 
                                     }
-                                });
-                            }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
                         }
-//                        else viewHolder.itemView.setVisibility(View.INVISIBLE);
-                   }
-                };
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
 
 
-        requestList.setAdapter(adapter);
 
 
 
@@ -138,7 +132,7 @@ public class RequestFragment extends Fragment  {
         SharedPreferences mPref = getActivity().getSharedPreferences(WIDGET_PREF, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mPref.edit();
         Gson gson = new Gson();
-        String json = gson.toJson(widgetList);
+        String json = gson.toJson(users);
         Log.d("WidgetProcess","json in saveInfo is "+json);
         editor.putString(EDITOR_WIDGET_PREF,json);
         editor.apply();

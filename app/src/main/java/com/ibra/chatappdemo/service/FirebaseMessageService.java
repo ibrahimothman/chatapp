@@ -10,7 +10,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -18,13 +17,12 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.ibra.chatappdemo.R;
 import com.ibra.chatappdemo.ui.AllusersActivity;
-import com.ibra.chatappdemo.ui.MainActivity;
 
 public class FirebaseMessageService extends FirebaseMessagingService {
 
-    private static final String CHANNEL_ID = "NOTIFICATION_CHANNEL_ID";
-    private static final int WATER_REMINDER_NOTIFICATION_ID = 55;
-    private static final int WATER_REMINDER_PENDING_INTENT_ID = 66;
+
+    private static final int REMINDER_NOTIFICATION_ID = 55;
+    private static final int REMINDER_PENDING_INTENT_ID = 66;
     private int notificationId = (int) System.currentTimeMillis();
 
     @Override
@@ -40,13 +38,6 @@ public class FirebaseMessageService extends FirebaseMessagingService {
 
         NotificationManager notificationManager = (NotificationManager)
                 getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel mChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    getApplicationContext().getString(R.string.main_notification_channel_name),
-                    NotificationManager.IMPORTANCE_HIGH);
-            notificationManager.createNotificationChannel(mChannel);
-        }
 
         Intent intent = new Intent(action);
         intent.putExtra(AllusersActivity.USER_ID_EXTRA,from_user_id);
@@ -55,13 +46,13 @@ public class FirebaseMessageService extends FirebaseMessagingService {
 
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this,CHANNEL_ID)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setSmallIcon(R.drawable.ic_launcher_background)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(
-                        getString(R.string.charging_reminder_notification_body)))
+                        message))
                 .setDefaults(Notification.DEFAULT_VIBRATE)
                 .setContentIntent(pendingIntent)
                 .setSound(alarmSound)
@@ -72,7 +63,7 @@ public class FirebaseMessageService extends FirebaseMessagingService {
                 && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
         }
-        notificationManager.notify(WATER_REMINDER_NOTIFICATION_ID, notificationBuilder.build());
+        notificationManager.notify(REMINDER_NOTIFICATION_ID, notificationBuilder.build());
 
     }
 

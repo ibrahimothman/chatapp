@@ -121,8 +121,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnFocusChan
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                            if(task.isSuccessful()){
-                               String deviceToken = FirebaseInstanceId.getInstance().getToken();
-                               FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid()).child("device_token").setValue(deviceToken);
+//                               String deviceToken = FirebaseInstanceId.getInstance().getToken();
+//                               FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid()).child("device_token").setValue(deviceToken);
                                 changeSharedPreference();
                                launchMainActivity();
                            } else{

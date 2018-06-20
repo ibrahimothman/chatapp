@@ -219,18 +219,7 @@ public class ChatFragment extends Fragment {
 
 
 
-//    private void saveWidgetInfoIntoSharedPref() {
-//        if(getActivity() != null) {
-//            SharedPreferences mPref = getContext().getSharedPreferences(WIDGET_PREF, Context.MODE_PRIVATE);
-//            SharedPreferences.Editor editor = mPref.edit();
-//            Gson gson = new Gson();
-//            String json = gson.toJson(widgetList);
-//            Log.d("WidgetProcess", "json in saveInfo is " + json);
-//            editor.putString(EDITOR_WIDGET_PREF, json);
-//            editor.apply();
-//            updateWidget(getContext());
-//        }
-//    }
+
 
     private void updateWidget(Context context) {
         Log.d("WidgetProcess","inside updateWidget");

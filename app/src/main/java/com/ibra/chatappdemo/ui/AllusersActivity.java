@@ -68,9 +68,27 @@ public class AllusersActivity extends AppCompatActivity {
         ) {
             @Override
             protected void populateViewHolder(UserListViewHolder viewHolder, User model, int position) {
-                Toast.makeText(AllusersActivity.this, "offffff", Toast.LENGTH_SHORT).show();
-                String profileUid = getRef(position).getKey();
-                viewHolder.bind(AllusersActivity.this,model,profileUid);
+
+                final String profileUid = getRef(position).getKey();
+
+                if(profileUid.equals(currentUid)){
+                    Log.d(TAG,"yourprofile");
+                    viewHolder.setName("You");
+                }else viewHolder.setName(model.getuName());
+
+                viewHolder.setStatus(model.getuStatus());
+
+                if(model.getuThumb() != null && !model.getuThumb().equals("default"))
+                    viewHolder.setImage(model.getuThumb());
+
+                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent userProfileIntent = new Intent(getApplicationContext(),UserProfileActivity.class);
+                        userProfileIntent.putExtra(USER_ID_EXTRA,profileUid);
+                        startActivity(userProfileIntent);
+                    }
+                });
             }
         };
         usersList.setAdapter(adapter);
@@ -78,48 +96,34 @@ public class AllusersActivity extends AppCompatActivity {
 
     }
 
-    public static  class UserListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public static  class UserListViewHolder extends RecyclerView.ViewHolder{
 
 
         CircleImageView image;
         TextView name;
         TextView status;
-        String uid;
-        Context mContext;
-        String profileUid;
-
-
+        View mView;
         public UserListViewHolder(View itemView) {
             super(itemView);
+            mView = itemView;
             image =(CircleImageView) itemView.findViewById(R.id.user_image_list);
             name =(TextView) itemView.findViewById(R.id.user_name_list);
             status =(TextView) itemView.findViewById(R.id.user_status_list);
-            itemView.setOnClickListener(this);
+
 
         }
 
-        public void bind(Context context, User model,String profileUid){
-            this.mContext = context;
-            this.profileUid = profileUid;
-            Log.d(TAG,"profileid is "+profileUid);
-            Log.d(TAG,"currentid is "+currentUid);
-            if(profileUid.equals(currentUid)){
-                Log.d(TAG,"yourprofile");
-                name.setText("You");
-            }else name.setText(model.getuName());
+        public void setName(String s) {
 
-            status.setText(model.getuStatus());
-            if(!model.getuThumb().equals("default"));
-             Picasso.get().load(model.getuThumb()).placeholder(R.drawable.thumb_default_image).into(image);
+            name.setText(s);
         }
 
+        public void setStatus(String s) {
+            status.setText(s);
+        }
 
-        @Override
-        public void onClick(View view) {
-            Intent userProfileIntent = new Intent(mContext,UserProfileActivity.class);
-            userProfileIntent.putExtra(USER_ID_EXTRA,profileUid);
-            mContext.startActivity(userProfileIntent);
-
+        public void setImage(String s) {
+            Picasso.get().load(s).placeholder(R.drawable.thumb_default_image).into(image);
         }
     }
 
