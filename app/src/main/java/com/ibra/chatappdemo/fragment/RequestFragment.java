@@ -1,6 +1,10 @@
 package com.ibra.chatappdemo.fragment;
 
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -22,15 +26,22 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 import com.ibra.chatappdemo.R;
 import com.ibra.chatappdemo.listener.IntefaceListener;
 import com.ibra.chatappdemo.model.Request;
 import com.ibra.chatappdemo.model.User;
+import com.ibra.chatappdemo.widget.ChatWidget;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class RequestFragment extends Fragment  {
+
+    public static final String WIDGET_PREF = "WIDGET_PREF";
+    public static final String EDITOR_WIDGET_PREF = "EDITOR_WIDGET_PREF";
 
     RecyclerView requestList;
     String currentId;
@@ -39,6 +50,7 @@ public class RequestFragment extends Fragment  {
     IntefaceListener.acceptFriendRequest acceptListener;
     IntefaceListener.declineFriendRequest declineListener;
     ConstraintLayout reqItemLayout;
+    ArrayList<User> widgetList = new ArrayList<>();
 
     public RequestFragment() {
     }
@@ -79,8 +91,12 @@ public class RequestFragment extends Fragment  {
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         if (dataSnapshot != null) {
                                             User user = dataSnapshot.getValue(User.class);
+
                                             viewHolder.name.setText(user.getuName());
                                             Picasso.get().load(user.getuThumb()).placeholder(R.drawable.thumb_default_image).into(viewHolder.image);
+                                            widgetList.add(user);
+                                            saveRequestIntoSharedPref();
+
                                             viewHolder.confirmBtn.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View view) {
@@ -116,6 +132,25 @@ public class RequestFragment extends Fragment  {
 
 
         return view;
+    }
+
+    private void saveRequestIntoSharedPref() {
+        SharedPreferences mPref = getActivity().getSharedPreferences(WIDGET_PREF, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = mPref.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(widgetList);
+        Log.d("WidgetProcess","json in saveInfo is "+json);
+        editor.putString(EDITOR_WIDGET_PREF,json);
+        editor.apply();
+        updateWidget(getContext());
+    }
+
+    private void updateWidget(Context context) {
+        Log.d("WidgetProcess","inside updateWidget");
+        AppWidgetManager manager = AppWidgetManager.getInstance(getContext());
+        ComponentName componentName = new ComponentName(context, ChatWidget.class);
+        int[]appwidgetIds = manager.getAppWidgetIds(componentName);
+        manager.notifyAppWidgetViewDataChanged(appwidgetIds,R.id.widget_list_view);
     }
 
 

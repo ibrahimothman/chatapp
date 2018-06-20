@@ -38,5 +38,7 @@ dependencies {
     implementation 'id.zelory:compressor:2.1.0'
     implementation 'com.google.firebase:firebase-messaging:10.2.0'
 
+    implementation 'com.google.code.gson:gson:2.8.5'
+
 }
 apply plugin: 'com.google.gms.google-services'

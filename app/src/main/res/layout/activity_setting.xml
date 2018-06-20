@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+<android.support.constraint.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#f5f5f5
@@ -19,6 +24,9 @@
     </android.support.design.widget.AppBarLayout>
 
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/image_profile"
         android:layout_width="192dp"
@@ -173,4 +181,7 @@
         app:layout_constraintStart_toStartOf="@+id/image_profile"
         app:layout_constraintTop_toTopOf="@+id/image_profile"
         app:layout_constraintVertical_bias="0.913" />
+
+
 </android.support.constraint.ConstraintLayout>
+    </ScrollView>

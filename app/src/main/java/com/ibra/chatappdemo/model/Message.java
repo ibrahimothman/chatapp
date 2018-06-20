@@ -7,12 +7,14 @@ public class Message {
     private String seen;
     private String from;
 
+
     public Message(String message, String time, String type, String seen, String from) {
         this.message = message;
         this.time = time;
         this.type = type;
         this.seen = seen;
         this.from = from;
+
     }
 
     public Message() {
@@ -57,4 +59,6 @@ public class Message {
     public void setFrom(String from) {
         this.from = from;
     }
+
+
 }

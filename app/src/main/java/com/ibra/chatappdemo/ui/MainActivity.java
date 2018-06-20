@@ -62,9 +62,7 @@ public class MainActivity extends AppCompatActivity implements IntefaceListener.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(getIntent().getStringExtra(ChatWidgetRemoteFactory.POSITION_EXTRA) != null){
-            Log.d(TAG,"position is "+getIntent().getStringExtra(ChatWidgetRemoteFactory.POSITION_EXTRA));
-        }else Log.d(TAG,"position is null");
+       
 
         prefStart = new SharedPreferenceStart(this);
         Log.d(TAG,"statusIs "+prefStart.isFirstTime_app());
@@ -94,6 +92,11 @@ public class MainActivity extends AppCompatActivity implements IntefaceListener.
         rootRef = FirebaseDatabase.getInstance().getReference();
 
 
+        // if mainActivity launched from widget go to request fragment
+        Intent intent = getIntent();
+        if (intent != null && intent.getStringExtra(ChatWidgetRemoteFactory.WIDGET_EXTRA) != null){
+            mViewPager.setCurrentItem(2);
+        }
     }
 
     @Override

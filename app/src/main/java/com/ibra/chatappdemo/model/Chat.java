@@ -5,6 +5,7 @@ public class Chat {
     public boolean seen;
     public long timestamp;
 
+
     public Chat(){
 
     }

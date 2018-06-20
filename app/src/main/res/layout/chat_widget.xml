@@ -6,10 +6,21 @@
     android:orientation="vertical"
     android:padding="@dimen/widget_margin">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorPrimary"
+        android:text="Friend Requests"
+        android:id="@+id/app_name"
+        android:textSize="24sp"
+        android:padding="10dp"
+        android:textColor="@android:color/white"/>
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/widget_list_view"
+        android:layout_below="@+id/app_name"
         >
 
     </ListView>

@@ -234,9 +234,10 @@ public class ChatActivity extends AppCompatActivity {
             Message message = new Message();
             message.setMessage(messageContent);
             message.setSeen("false");
-            message.setTime(String.valueOf(ServerValue.TIMESTAMP));
+            message.setTime(String.valueOf(System.currentTimeMillis()*-1));
             message.setType("text");
             message.setFrom(currentId);
+
 
             DatabaseReference pushIdRef = mRootRef.child(getString(R.string.messages_table)).child(currentId).child(friendId).push();
             String pushId = pushIdRef.getKey();
@@ -258,10 +259,10 @@ public class ChatActivity extends AppCompatActivity {
 
             // conversation
             mRootRef.child("Chat").child(currentId).child(friendId).child("seen").setValue(true);
-            mRootRef.child("Chat").child(currentId).child(friendId).child("timestamp").setValue(ServerValue.TIMESTAMP);
+            mRootRef.child("Chat").child(currentId).child(friendId).child("timestamp").setValue(System.currentTimeMillis()*-1);
 
             mRootRef.child("Chat").child(friendId).child(currentId).child("seen").setValue(false);
-            mRootRef.child("Chat").child(friendId).child(currentId).child("timestamp").setValue(ServerValue.TIMESTAMP);
+            mRootRef.child("Chat").child(friendId).child(currentId).child("timestamp").setValue(System.currentTimeMillis()*-1);
 
             mRootRef.updateChildren(messageMap, new DatabaseReference.CompletionListener() {
                 @Override

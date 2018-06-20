@@ -9,7 +9,7 @@ public class ChatWidgetService extends RemoteViewsService {
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
-        return new ChatWidgetRemoteFactory(this.getApplicationContext(),intent);
+        return new ChatWidgetRemoteFactory(this.getApplicationContext());
 
     }
 }

@@ -1,5 +1,6 @@
 package com.ibra.chatappdemo.widget;
 
+import android.app.WallpaperInfo;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
@@ -8,31 +9,42 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.ibra.chatappdemo.R;
 import com.ibra.chatappdemo.fragment.ChatFragment;
+import com.ibra.chatappdemo.fragment.FreindFragment;
+import com.ibra.chatappdemo.fragment.RequestFragment;
 import com.ibra.chatappdemo.model.Friend;
+import com.ibra.chatappdemo.model.Message;
 import com.ibra.chatappdemo.model.User;
+import com.ibra.chatappdemo.model.Widget;
 import com.ibra.chatappdemo.ui.MainActivity;
 
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NavigableMap;
+import java.util.Set;
 
 public class ChatWidgetRemoteFactory implements RemoteViewsService.RemoteViewsFactory {
 
 
-    public static final String POSITION_EXTRA = "POSITION_EXTRA";
+    public static final String WIDGET_EXTRA = "POSITION_EXTRA";
     private Context context;
-    Intent intent;
-    int appWidgetId;
+    private ArrayList<User> list;
+    private String name;
 
 
-
-
-    public ChatWidgetRemoteFactory(Context context, Intent intent) {
+    public ChatWidgetRemoteFactory(Context context) {
         Log.d("from widget Adapter","done");
         this.context = context;
-        this.intent = intent;
-        appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,AppWidgetManager.INVALID_APPWIDGET_ID);
+        list = new ArrayList<>();
 
 
 
@@ -50,9 +62,12 @@ public class ChatWidgetRemoteFactory implements RemoteViewsService.RemoteViewsFa
 
     @Override
     public void onDataSetChanged() {
-
+        Log.d("DataSetChanged","inside");
+        list = getData();
 
     }
+
+
 
     @Override
     public void onDestroy() {
@@ -61,30 +76,48 @@ public class ChatWidgetRemoteFactory implements RemoteViewsService.RemoteViewsFa
 
     @Override
     public int getCount() {
-        return 10;
+        if(list != null && list.size() > 0){
+            return list.size();
+        }else return 0;
     }
 
     @Override
-    public RemoteViews getViewAt(int i) {
-        Log.d("fromFactory","getViewItem");
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_list_item);
-        SharedPreferences sharedPreferences = context.getSharedPreferences(ChatFragment.WIDGET_PREF,Context.MODE_PRIVATE);
-        String message = sharedPreferences.getString(ChatFragment.MESSAGE_WIDGET_PREF,null);
-        String name = sharedPreferences.getString(ChatFragment.NAME_WIDGET_PREF,null);
-        String time = sharedPreferences.getString(ChatFragment.TIME_WIDGET_PREF,null);
-        views.setTextViewText(R.id.user_message_widget,message);
-        views.setTextViewText(R.id.user_name_widget,name);
-        views.setTextViewText(R.id.message_time_widget,time);
-        Log.d("fromfactory","name is "+name);
-        Log.d("fromfactory","message is "+message);
+    public RemoteViews getViewAt(final int i) {
+
+        Log.d("fromFactorygetViewAt","inside");
+        final RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_list_item);
+        if(list != null){
+
+        }else Log.d("fromFactorygetData","name is null");
+
+
+        views.setTextViewText(R.id.user_name_widget,list.get(i).getuName());
 
 
         Intent fillInIntent = new Intent(context, MainActivity.class);
-        fillInIntent.putExtra(POSITION_EXTRA,i+"");
+        fillInIntent.putExtra(WIDGET_EXTRA,"intent from widget");
         views.setOnClickFillInIntent(R.id.list_view_row, fillInIntent);
 
         return views;
     }
+
+
+    private ArrayList<User> getData() {
+        Log.d("WidgetProcess","inside getData");
+        SharedPreferences sharedPreferences = context.getSharedPreferences(RequestFragment.WIDGET_PREF,Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json  = sharedPreferences.getString(RequestFragment.EDITOR_WIDGET_PREF,null);
+        Log.d("WidgetProcess","json in getData is"+json);
+        Type type = new TypeToken<ArrayList<User>>(){}.getType();
+        ArrayList<User> arrayList = gson.fromJson(json,type);
+
+        return arrayList;
+
+    }
+
+
+
+
 
     @Override
     public RemoteViews getLoadingView() {

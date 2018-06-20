@@ -16,6 +16,7 @@ public class Widget {
     }
 
     public String getMessage() {
+
         return message;
     }
 
