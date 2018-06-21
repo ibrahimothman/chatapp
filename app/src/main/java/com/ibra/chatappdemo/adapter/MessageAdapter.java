@@ -34,9 +34,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
     private String friendImage;
     private String messageImage;
 
-    public MessageAdapter(Context context, ArrayList<Message> messages) {
+    public MessageAdapter(Context context) {
         this.context = context;
-        this.messages = messages;
         currentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
@@ -56,9 +55,17 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
 
     }
 
+    public void notifyAdapter(ArrayList<Message>messages){
+        if(this.messages != messages){
+            this.messages = messages;
+            this.notifyDataSetChanged();
+        }
+    }
+
     @Override
     public int getItemCount() {
-        return messages.size();
+        if(messages != null) return messages.size();
+        else return 0;
     }
 
     public class MessageHolder extends RecyclerView.ViewHolder{

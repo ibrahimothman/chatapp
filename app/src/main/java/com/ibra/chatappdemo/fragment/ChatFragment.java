@@ -102,6 +102,7 @@ public class ChatFragment extends Fragment {
             ) {
                 @Override
                 protected void populateViewHolder(final ChatViewHolder viewHolder, Chat model, int position) {
+                    Log.d("fromchatfragment","load data");
                     final String friendId = getRef(position).getKey();
                     final boolean isSeen = model.isSeen();
                     final Long time = model.getTimestamp();

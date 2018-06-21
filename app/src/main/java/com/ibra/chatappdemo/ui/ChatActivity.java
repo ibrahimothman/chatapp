@@ -1,9 +1,8 @@
 package com.ibra.chatappdemo.ui;
 
 import android.content.Intent;
-import android.net.Uri;
-import android.os.PersistableBundle;
-import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.NavUtils;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,11 +16,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -31,16 +28,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.ibra.chatappdemo.R;
 import com.ibra.chatappdemo.adapter.MessageAdapter;
 import com.ibra.chatappdemo.helper.TimeAgo;
 import com.ibra.chatappdemo.model.Message;
 import com.squareup.picasso.Picasso;
 
+import java.lang.annotation.Native;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,6 +48,10 @@ public class ChatActivity extends AppCompatActivity {
     private static final int LIMIT_TO_LAST = 5;
     private static final int PICK_IMAGE = 55;
     private static final String FINAL_PAGE_NUMBER = "FINAL_PAGE_NUMBER";
+    private static final String FIRST_LIST_POSITION = "FIRST_LIST_POSITION";
+    private static final String LAST_LIST_POSITION = "LAST_LIST_POSITION";
+
+
     private  int pageNumber = 1;
     private Toolbar mToolbar;
     private TextView nameTxt,lastseenTxt;
@@ -64,9 +63,13 @@ public class ChatActivity extends AppCompatActivity {
     private ArrayList<Message> messages;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private int pos = 0;
+    private int firstListPosition;
 
 
 
+
+
+    RelativeLayout chatLayout;
 
     private DatabaseReference mRootRef;
 
@@ -75,12 +78,13 @@ public class ChatActivity extends AppCompatActivity {
     private String lastItemKey,prevItemKey;
     private StorageReference imageStorageRef;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-
+        Log.d("fromchatactivity","insideoncreate");
 
         // setupm toolbar
         mToolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -107,8 +111,24 @@ public class ChatActivity extends AppCompatActivity {
         messageList.setLayoutManager(new LinearLayoutManager(this));
         messageList.setHasFixedSize(true);
         messages = new ArrayList<>();
-        messageAdapter = new MessageAdapter(this,messages);
+        messageAdapter = new MessageAdapter(this);
         messageList.setAdapter(messageAdapter);
+
+
+        chatLayout = (RelativeLayout)findViewById(R.id.chat_activity);
+
+
+
+        if(savedInstanceState != null){
+            Log.d("fromchatactivity","saved is not null");
+            pageNumber = savedInstanceState.getInt(FINAL_PAGE_NUMBER);
+            firstListPosition = savedInstanceState.getInt(FIRST_LIST_POSITION);
+            Log.d("fromchatactivity","fromoncreatepositionis"+ firstListPosition);
+        }
+
+
+
+
 
         //get friend id from intent
         Intent intent = getIntent();
@@ -219,6 +239,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 pageNumber++;
+                Log.d("fromchatactivity","from onrefresh page is "+pageNumber);
                 pos = 0;
                 loadMoreMessage();
             }
@@ -273,7 +294,7 @@ public class ChatActivity extends AppCompatActivity {
                        Log.d(TAG,"error is"+databaseError.getMessage().toString());
                    } else{
                         messageTxt.setText("");
-                        messageList.scrollToPosition(messages.size() - 1);
+//                        messageList.scrollToPosition(messages.size() - 1);
                    }
                 }
             });
@@ -283,6 +304,7 @@ public class ChatActivity extends AppCompatActivity {
     private void retreiveMessages() {
 
         // get current user and friend images
+
 
         if(currentId != null && friendId != null) {
             DatabaseReference messageRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.messages_table))
@@ -304,8 +326,10 @@ public class ChatActivity extends AppCompatActivity {
                                 prevItemKey = dataSnapshot.getKey();
                                 Log.d(TAG, "lastKeyIs " + lastItemKey);
                             }
-                            messageAdapter.notifyDataSetChanged();
-                            messageList.scrollToPosition(messages.size() - 1);
+
+                            messageAdapter.notifyAdapter(messages);
+                            Log.d("fromchatactivity","firstpositionis"+ firstListPosition);
+                            messageList.scrollToPosition(firstListPosition);
                             mSwipeRefreshLayout.setRefreshing(false);
 
                         }
@@ -388,18 +412,27 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
-        outState.putInt(FINAL_PAGE_NUMBER,pageNumber);
-    }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if(savedInstanceState != null){
-            pageNumber = savedInstanceState.getInt(FINAL_PAGE_NUMBER);
-            Log.d("fromchatactivity","saved not null and page is "+pageNumber);
-        }
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d("fromchatactivity","from onsaved page is "+pageNumber);
+        outState.putInt(FINAL_PAGE_NUMBER,pageNumber);
+        firstListPosition = ((LinearLayoutManager)messageList.getLayoutManager()).findFirstVisibleItemPosition();
+        Log.d("fromchatactivity","from onsaved firstvisible is "+ firstListPosition);
+        outState.putInt(FIRST_LIST_POSITION, firstListPosition);
+
+
+
     }
+
+
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+
 }

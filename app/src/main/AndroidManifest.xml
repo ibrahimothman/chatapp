@@ -58,7 +58,8 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".ui.ChatActivity">
+        <activity android:name=".ui.ChatActivity"
+            android:parentActivityName=".ui.MainActivity">
             <intent-filter>
                 <action android:name="com.ibra.chatappdemo.ui.chatactivity.CHAT_TARGER" />
 
