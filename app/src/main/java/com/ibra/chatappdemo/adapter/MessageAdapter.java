@@ -1,14 +1,12 @@
 package com.ibra.chatappdemo.adapter;
 
 import android.content.Context;
-import android.renderscript.ScriptIntrinsicYuvToRGB;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,9 +32,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
     private String friendImage;
     private String messageImage;
 
+
     public MessageAdapter(Context context) {
         this.context = context;
         currentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+
     }
 
 
@@ -46,7 +47,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
     @NonNull
     @Override
     public MessageHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new MessageHolder(LayoutInflater.from(context).inflate(R.layout.message_list_item,parent,false));
+        Log.d("frommessageadapter","onCreateViewHolder");
+        if(viewType == 1){
+            // user send message
+            return new MessageHolder(LayoutInflater.from(context).inflate(R.layout.message_list_item_user,parent,false));
+        }else
+            return new MessageHolder(LayoutInflater.from(context).inflate(R.layout.message_list_item_friend,parent,false));
     }
 
     @Override
@@ -64,8 +70,19 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
 
     @Override
     public int getItemCount() {
+        Log.d("frommessageadapter","getItemCount");
         if(messages != null) return messages.size();
         else return 0;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        Log.d("frommessageadapter","getItemViewType");
+        String from_user_id = messages.get(position).getFrom();
+        if(from_user_id != null && from_user_id.equals(currentId)){
+            return 1;
+        }else return 2;
+
     }
 
     public class MessageHolder extends RecyclerView.ViewHolder{
@@ -82,8 +99,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
 
 
         public void bind(int position){
+            Log.d("frommessageadapter","bind");
 
-            Log.d("fromAdapter","bind");
             String from_user_id = messages.get(position).getFrom();
 
 
