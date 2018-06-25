@@ -29,14 +29,18 @@ public class AllusersActivity extends AppCompatActivity {
 
     private static final String TAG = AllusersActivity.class.getCanonicalName();
     public static final String USER_ID_EXTRA = "user_id_for_profile_activity";
+    private static final String LIST_POSITION = "LIST_POSITION";
+
+
     private Toolbar mToolbar;
     private RecyclerView usersList;
     private DatabaseReference mDatabase;
     private static String currentUid;
 
-    private String TAg = "sdasd";
+
     ArrayList<User> users = new ArrayList<>();
     FirebaseRecyclerAdapter<User,UserListViewHolder> adapter;
+    private int listPosition = 0;
 
 
     @Override
@@ -55,6 +59,11 @@ public class AllusersActivity extends AppCompatActivity {
         usersList.setLayoutManager(new LinearLayoutManager(this));
         usersList.setHasFixedSize(true);
 
+        // get list position after rotation
+        if(savedInstanceState != null){
+            listPosition = savedInstanceState.getInt(LIST_POSITION);
+        }
+
 
         // get current user id
         currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -68,7 +77,7 @@ public class AllusersActivity extends AppCompatActivity {
         ) {
             @Override
             protected void populateViewHolder(UserListViewHolder viewHolder, User model, int position) {
-
+                Log.d(TAG,"insidepopulate");
                 final String profileUid = getRef(position).getKey();
 
                 if(profileUid.equals(currentUid)){
@@ -89,9 +98,14 @@ public class AllusersActivity extends AppCompatActivity {
                         startActivity(userProfileIntent);
                     }
                 });
+
+
             }
         };
+
         usersList.setAdapter(adapter);
+        Log.d(TAG,"listpositionis "+listPosition);
+        usersList.smoothScrollToPosition(listPosition);
 
 
     }
@@ -128,6 +142,14 @@ public class AllusersActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        listPosition =((LinearLayoutManager)usersList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        Log.d(TAG,"fromsavedinsta position is "+listPosition);
+        outState.putInt(LIST_POSITION,listPosition);
+
+    }
 
 
 

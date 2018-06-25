@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -49,9 +51,7 @@ public class FreindFragment extends Fragment {
     private static final String TAG = FreindFragment.class.getCanonicalName();
 
     public static final String USER_INFO_EXTRA = "user_info_extra";
-
-
-
+    private static final String LIST_POSITION = "LIST_POSITION";
 
 
     private DatabaseReference friendDatabase,userDatabase;
@@ -59,7 +59,7 @@ public class FreindFragment extends Fragment {
     private String friendId;
     private String currentId;
     private User user;
-
+    private int listPosition;
 
 
     public FreindFragment() {
@@ -70,6 +70,9 @@ public class FreindFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friend,container,false);
 
+        friendList = (RecyclerView) view.findViewById(R.id.friend_list);
+        friendList.setLayoutManager(new LinearLayoutManager(getContext()));
+        friendList.setHasFixedSize(true);
 
 
         if(FirebaseAuth.getInstance().getCurrentUser() != null) {
@@ -107,6 +110,7 @@ public class FreindFragment extends Fragment {
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
+                                    Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
 
                                 }
                             });
@@ -116,7 +120,7 @@ public class FreindFragment extends Fragment {
                                     public void onClick(View view) {
                                         String[] options = {"view profile","send message"};
                                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                                        builder.setTitle("choose option");
+                                        builder.setTitle(R.string.choose_option_dialoge);
                                         builder.setItems(options, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -142,9 +146,14 @@ public class FreindFragment extends Fragment {
                         }
                     };
 
-            friendList = (RecyclerView) view.findViewById(R.id.friend_list);
-            friendList.setLayoutManager(new LinearLayoutManager(getContext()));
-            friendList.setHasFixedSize(true);
+
+            // get list position after rotation
+            if(savedInstanceState != null){
+                Log.d("fromRequestFragment","savedInstanceState not null");
+                listPosition = savedInstanceState.getInt(LIST_POSITION);
+            }else listPosition = 0;
+
+            friendList.smoothScrollToPosition(listPosition);
             friendList.setAdapter(adapter);
         }
 
@@ -171,5 +180,16 @@ public class FreindFragment extends Fragment {
         }
 
 
+    }
+
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(friendList.getLayoutManager() != null) {
+            listPosition = ((LinearLayoutManager) friendList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+            Log.d(TAG, "fromsavedinsta position is " + listPosition);
+            outState.putInt(LIST_POSITION, listPosition);
+        }
     }
 }

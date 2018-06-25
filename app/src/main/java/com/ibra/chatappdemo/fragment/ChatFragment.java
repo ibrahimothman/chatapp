@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -51,6 +52,10 @@ public class ChatFragment extends Fragment {
 
     public static final String WIDGET_PREF = "WIDGET_PREF";
     public static final String EDITOR_WIDGET_PREF = "EDITOR_WIDGET_PREF";
+    private static final String TAG = ChatFragment.class.getCanonicalName();
+    private static final String LIST_POSITION = "LIST_POSITION";
+
+
     private FirebaseAuth mAuth;
     private String currentUserId;
     private DatabaseReference messageRef;
@@ -58,13 +63,7 @@ public class ChatFragment extends Fragment {
     private DatabaseReference mUserRef;
     private RecyclerView chatList;
 
-
-
-
-
-
-
-
+    private int listPosition ;
 
 
     public ChatFragment() {
@@ -79,9 +78,16 @@ public class ChatFragment extends Fragment {
 
 
 
+
         chatList = (RecyclerView)view.findViewById(R.id.chat_list);
         chatList.setLayoutManager(new LinearLayoutManager(getContext()));
         chatList.setHasFixedSize(true);
+
+        // get list position after rotation
+        if(savedInstanceState != null){
+            Log.d("fromRequestFragment","savedInstanceState not null");
+            listPosition = savedInstanceState.getInt(LIST_POSITION);
+        }else listPosition = 0;
 
 
 
@@ -120,7 +126,7 @@ public class ChatFragment extends Fragment {
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-
+                            Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
                         }
                     });
 
@@ -129,8 +135,14 @@ public class ChatFragment extends Fragment {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if(getActivity() != null) {
-                                String name = dataSnapshot.child(getString(R.string.username_key)).getValue().toString();
-                                String image = dataSnapshot.child(getString(R.string.thumb_image_key)).getValue().toString();
+                                if(dataSnapshot.hasChild(getString(R.string.username_key))) {
+                                    String name = dataSnapshot.child(getString(R.string.username_key)).getValue().toString();
+                                    viewHolder.setName(name);
+                                }
+                                if(dataSnapshot.hasChild(getString(R.string.thumb_image_key))) {
+                                    String image = dataSnapshot.child(getString(R.string.thumb_image_key)).getValue().toString();
+                                    viewHolder.setImage(image);
+                                }
                                 if (dataSnapshot.hasChild("online")) {
 
                                     String onlineState = dataSnapshot.child("online").getValue().toString();
@@ -138,8 +150,8 @@ public class ChatFragment extends Fragment {
 
                                 }
 
-                                viewHolder.setName(name);
-                                viewHolder.setImage(image);
+
+
                             }
 
 
@@ -159,7 +171,7 @@ public class ChatFragment extends Fragment {
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-
+                            Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
                         }
                     });
 
@@ -167,6 +179,7 @@ public class ChatFragment extends Fragment {
 
 
             };
+            chatList.smoothScrollToPosition(listPosition);
             chatList.setAdapter(adapter);
 
 
@@ -179,7 +192,7 @@ public class ChatFragment extends Fragment {
     }
 
 
-    static class ChatViewHolder extends RecyclerView.ViewHolder{
+    public static class ChatViewHolder extends RecyclerView.ViewHolder{
 
         CircleImageView friendImage;
         TextView messageTxt;
@@ -231,6 +244,13 @@ public class ChatFragment extends Fragment {
     }
 
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        listPosition =((LinearLayoutManager)chatList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        Log.d(TAG,"fromsavedinsta position is "+listPosition);
+        outState.putInt(LIST_POSITION,listPosition);
+    }
 
 
 

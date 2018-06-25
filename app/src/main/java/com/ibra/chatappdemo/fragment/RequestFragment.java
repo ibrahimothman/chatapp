@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -43,6 +45,8 @@ public class RequestFragment extends Fragment  {
 
     public static final String WIDGET_PREF = "WIDGET_PREF";
     public static final String EDITOR_WIDGET_PREF = "EDITOR_WIDGET_PREF";
+    private static final String TAG = RequestFragment.class.getCanonicalName();
+    private static final String LIST_POSITION = "LIST_POSITION";
 
     RecyclerView requestList;
     String currentId;
@@ -52,8 +56,10 @@ public class RequestFragment extends Fragment  {
     ConstraintLayout reqItemLayout;
     ArrayList<User> widgetList = new ArrayList<>();
     RequestAdapter requestAdapter;
-    private String friendId;
+
     private ArrayList<User> users = new ArrayList<>();
+    private ArrayList<String> ids = new ArrayList<>();
+    private int listPosition ;
 
 
     public RequestFragment() {
@@ -63,7 +69,6 @@ public class RequestFragment extends Fragment  {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragemt_request,container,false);
-        reqItemLayout = (ConstraintLayout)view.findViewById(R.id.req_list_item_layout);
 
 
 
@@ -71,8 +76,14 @@ public class RequestFragment extends Fragment  {
         requestList =(RecyclerView) view.findViewById(R.id.request_list);
         requestList.setLayoutManager(new LinearLayoutManager(getContext()));
         requestList.setHasFixedSize(true);
-        requestAdapter = new RequestAdapter(getContext(),users,friendId);
+        requestAdapter = new RequestAdapter(getContext(),users);
         requestList.setAdapter(requestAdapter);
+
+        // get list position after rotation
+        if(savedInstanceState != null){
+            Log.d("fromRequestFragment","savedInstanceState not null");
+            listPosition = savedInstanceState.getInt(LIST_POSITION);
+        }else listPosition = 0;
 
 
         userRef = FirebaseDatabase.getInstance().getReference().child("users");
@@ -84,21 +95,29 @@ public class RequestFragment extends Fragment  {
         requestRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("fromRequestFragment","inside ondatachange");
                 users.clear();
-                requestAdapter.notifyDataSetChanged();
+                ids.clear();
+//                requestAdapter.notifyDataSetChanged();
                 saveRequestIntoSharedPref();
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    if (dataSnapshot != null) {
+                    if (data != null) {
                         Request request = data.getValue(Request.class);
                         if (request.getRequest_type().equals("receive")) {
-                            friendId = data.getKey();
+                            final String friendId = data.getKey();
                             userRef.child(friendId).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
+                                    Log.d("fromRequestFragment","insideondatachange2");
                                     if (dataSnapshot != null) {
                                         User user = dataSnapshot.getValue(User.class);
                                         users.add(user);
-                                        requestAdapter.notifyAdapter(friendId);
+                                        ids.add(friendId);
+                                        Log.d("fromRequestFragment","usersize is"+users.size());
+                                        Log.d("fromRequestFragment","friendId is "+friendId);
+                                        requestAdapter.notifyAdapter(users,ids);
+//                                        Log.d("fromRequestFragment","listpositionis "+listPosition);
+                                        requestList.smoothScrollToPosition(listPosition);
                                         saveRequestIntoSharedPref();
 
                                     }
@@ -106,7 +125,7 @@ public class RequestFragment extends Fragment  {
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
-
+                                    Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
                                 }
                             });
                         }
@@ -116,27 +135,25 @@ public class RequestFragment extends Fragment  {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
             }
 
         });
-
-
-
-
 
         return view;
     }
 
     private void saveRequestIntoSharedPref() {
-        SharedPreferences mPref = getActivity().getSharedPreferences(WIDGET_PREF, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = mPref.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(users);
-        Log.d("WidgetProcess","json in saveInfo is "+json);
-        editor.putString(EDITOR_WIDGET_PREF,json);
-        editor.apply();
-        updateWidget(getContext());
+        if(getActivity() != null) {
+            SharedPreferences mPref = getActivity().getSharedPreferences(WIDGET_PREF, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = mPref.edit();
+            Gson gson = new Gson();
+            String json = gson.toJson(users);
+            Log.d("WidgetProcess", "json in saveInfo is " + json);
+            editor.putString(EDITOR_WIDGET_PREF, json);
+            editor.apply();
+            updateWidget(getContext());
+        }
     }
 
     private void updateWidget(Context context) {
@@ -162,5 +179,13 @@ public class RequestFragment extends Fragment  {
             image = (CircleImageView) itemView.findViewById(R.id.user_image_list_req);
 
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        listPosition =((LinearLayoutManager)requestList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        Log.d(TAG,"fromsavedinsta position is "+listPosition);
+        outState.putInt(LIST_POSITION,listPosition);
     }
 }
