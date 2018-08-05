@@ -8,6 +8,7 @@ public class Message {
     private String from;
 
 
+
     public Message(String message, String time, String type, String seen, String from) {
         this.message = message;
         this.time = time;

@@ -236,6 +236,7 @@ public class ChatActivity extends AppCompatActivity {
             message.setTime(String.valueOf(System.currentTimeMillis()*-1));
             message.setType("text");
             message.setFrom(currentId);
+            message.setTime(String.valueOf(System.currentTimeMillis()));
 
 
             DatabaseReference pushIdRef = mRootRef.child(getString(R.string.messages_table)).child(currentId).child(friendId).push();
@@ -363,7 +364,7 @@ public class ChatActivity extends AppCompatActivity {
                         }
 
                         messageAdapter.notifyDataSetChanged();
-                        messageList.scrollToPosition(messages.size() - 1);
+//                        messageList.scrollToPosition(messages.size() - 1);
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
                 }

@@ -17,6 +17,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.ibra.chatappdemo.R;
+import com.ibra.chatappdemo.helper.TimeAgo;
 import com.ibra.chatappdemo.model.Message;
 import com.squareup.picasso.Picasso;
 
@@ -30,6 +31,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
     private ArrayList<Message> messages;
     private String currentId;
     private String currentUserImage;
+    private String name;
     private String friendImage;
     private String messageImage;
 
@@ -87,11 +89,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
 
         TextView content;
         CircleImageView image;
+        TextView nameTxt,timeTxt;
 
         public MessageHolder(View itemView) {
             super(itemView);
             content = (TextView)itemView.findViewById(R.id.message_content);
             image = (CircleImageView) itemView.findViewById(R.id.image_message);
+            nameTxt = (TextView) itemView.findViewById(R.id.text_message_name);
+            timeTxt = (TextView) itemView.findViewById(R.id.text_message_time);
 
         }
 
@@ -106,7 +111,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if(dataSnapshot != null){
                             currentUserImage = dataSnapshot.child(context.getString(R.string.thumb_image_key)).getValue().toString();
-                            Log.d("fromAdapter","current is "+currentUserImage);
+                            name = dataSnapshot.child(context.getString(R.string.username_key)).getValue().toString();
+                            nameTxt.setText(name);
+                            Log.d("fromAdapter","current is "+name);
                             if(currentUserImage != null){
                                 Picasso.get().load(currentUserImage).placeholder(R.drawable.thumb_default_image).into(image); }
 //                                notifyDataSetChanged();
@@ -129,7 +136,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if(dataSnapshot != null){
                             friendImage = dataSnapshot.child(context.getString(R.string.thumb_image_key)).getValue().toString();
-                            Log.d("fromAdapter","friend is "+friendImage);
+                            name = dataSnapshot.child(context.getString(R.string.username_key)).getValue().toString();
+                            nameTxt.setText(name);
+                            Log.d("fromAdapter","friend is "+name);
                             if(friendImage != null){
                                 Picasso.get().load(friendImage).placeholder(R.drawable.thumb_default_image).into(image);
                             }
@@ -145,8 +154,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
 
             }
 
-
-
+            String messageTime = TimeAgo.getTimeAgo(Long.parseLong(messages.get(position).getTime()));
+            timeTxt.setText(messageTime);
             content.setText(messages.get(position).getMessage());
 
 
