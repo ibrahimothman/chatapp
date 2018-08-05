@@ -1,5 +1,6 @@
 package com.ibra.chatappdemo.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
@@ -14,6 +15,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -63,15 +65,15 @@ public class ChatActivity extends AppCompatActivity {
     private RecyclerView messageList;
     private MessageAdapter messageAdapter;
     private ArrayList<Message> messages = new ArrayList<>();
-//    private SwipeRefreshLayout mSwipeRefreshLayout;
-//    private int pos = 0;
-//    private int firstListPosition;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private int pos = 0;
+    private int firstListPosition;
 
 
 
 
 
-//    RelativeLayout chatLayout;
+    RelativeLayout chatLayout;
 
     private DatabaseReference mRootRef;
 
@@ -106,7 +108,7 @@ public class ChatActivity extends AppCompatActivity {
 
         messageTxt = (EditText)findViewById(R.id.message_edit_text);
         sendImageBtn = (Button) findViewById(R.id.send_message_btn);
-//        mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh_layout);
+        mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh_layout);
 
         // recycler view
         messageList = (RecyclerView)findViewById(R.id.messages_list);
@@ -117,16 +119,16 @@ public class ChatActivity extends AppCompatActivity {
         messageList.setAdapter(messageAdapter);
 
 
-//        chatLayout = (RelativeLayout)findViewById(R.id.chat_activity);
+        chatLayout = (RelativeLayout)findViewById(R.id.chat_activity);
 
 
 
-//        if(savedInstanceState != null){
-//            Log.d("fromchatactivity","saved is not null");
-//            pageNumber = savedInstanceState.getInt(FINAL_PAGE_NUMBER);
-//            firstListPosition = savedInstanceState.getInt(FIRST_LIST_POSITION);
-//            Log.d("fromchatactivity","fromoncreatepositionis"+ firstListPosition);
-//        }else firstListPosition = 0;
+        if(savedInstanceState != null){
+            Log.d("fromchatactivity","saved is not null");
+            pageNumber = savedInstanceState.getInt(FINAL_PAGE_NUMBER);
+            firstListPosition = savedInstanceState.getInt(FIRST_LIST_POSITION);
+            Log.d("fromchatactivity","fromoncreatepositionis"+ firstListPosition);
+        }else firstListPosition = 0;
 
 
 
@@ -204,16 +206,18 @@ public class ChatActivity extends AppCompatActivity {
 
 
 
-//
-//        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                pageNumber++;
-//                Log.d("fromchatactivity","from onrefresh page is "+pageNumber);
-//                pos = 0;
-//                loadMoreMessage();
-//            }
-//        });
+
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                pageNumber++;
+                Log.d("fromchatactivity","from onrefresh page is "+pageNumber);
+                pos = 0;
+                loadMoreMessage();
+            }
+        });
+
+
 
 
     }
@@ -222,6 +226,8 @@ public class ChatActivity extends AppCompatActivity {
 
 
     private void sendMessage() {
+        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        mgr.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         String messageContent = messageTxt.getText().toString();
         if(!TextUtils.isEmpty(messageContent)){
             Message message = new Message();
@@ -292,19 +298,19 @@ public class ChatActivity extends AppCompatActivity {
                             messages.add(message);
                             Log.d(TAG,"message "+message.getMessage());
 
-//                            pos++;
-//                            if (pos == 1) {
-//                                lastItemKey = dataSnapshot.getKey();
-//                                prevItemKey = dataSnapshot.getKey();
-//                                Log.d(TAG, "lastKeyIs " + lastItemKey);
-//                            }
+                            pos++;
+                            if (pos == 1) {
+                                lastItemKey = dataSnapshot.getKey();
+                                prevItemKey = dataSnapshot.getKey();
+                                Log.d(TAG, "lastKeyIs " + lastItemKey);
+                            }
 
                             messageAdapter.notifyAdapter(messages);
-//                            Log.d("fromchatactivity","firstpositionis"+ firstListPosition);
-//                            if(firstListPosition >= 0) {
-//                                messageList.scrollToPosition(firstListPosition);
-//                            }
-//                            mSwipeRefreshLayout.setRefreshing(false);
+                            Log.d("fromchatactivity","firstpositionis"+ firstListPosition);
+                            if(firstListPosition >= 0) {
+                                messageList.scrollToPosition(firstListPosition);
+                            }
+                            mSwipeRefreshLayout.setRefreshing(false);
 
                         }
                     }
@@ -345,20 +351,20 @@ public class ChatActivity extends AppCompatActivity {
                     Message message = dataSnapshot.getValue(Message.class);
                     if(message != null){
                         Log.d(TAG,"message is "+message.getMessage());
-//                        if(!prevItemKey.equals(dataSnapshot.getKey())){
-//                            messages.add(pos++,message);
-//                        }else{
-//                            prevItemKey = lastItemKey;
-//                        }
+                        if(!prevItemKey.equals(dataSnapshot.getKey())){
+                            messages.add(pos++,message);
+                        }else{
+                            prevItemKey = lastItemKey;
+                        }
 
-//                        if(pos == 1){
-//                            lastItemKey = dataSnapshot.getKey();
-//                            Log.d(TAG,"lastKeyIs "+lastItemKey);
-//                        }
+                        if(pos == 1){
+                            lastItemKey = dataSnapshot.getKey();
+                            Log.d(TAG,"lastKeyIs "+lastItemKey);
+                        }
 
                         messageAdapter.notifyDataSetChanged();
-//                        messageList.scrollToPosition(messages.size() - 1);
-//                        mSwipeRefreshLayout.setRefreshing(false);
+                        messageList.scrollToPosition(messages.size() - 1);
+                        mSwipeRefreshLayout.setRefreshing(false);
                     }
                 }
             }
@@ -392,9 +398,9 @@ public class ChatActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         Log.d("fromchatactivity","from onsaved page is "+pageNumber);
         outState.putInt(FINAL_PAGE_NUMBER,pageNumber);
-//        firstListPosition = ((LinearLayoutManager)messageList.getLayoutManager()).findFirstVisibleItemPosition();
-//        Log.d("fromchatactivity","from onsaved firstvisible is "+ firstListPosition);
-//        outState.putInt(FIRST_LIST_POSITION, firstListPosition);
+        firstListPosition = ((LinearLayoutManager)messageList.getLayoutManager()).findFirstVisibleItemPosition();
+        Log.d("fromchatactivity","from onsaved firstvisible is "+ firstListPosition);
+        outState.putInt(FIRST_LIST_POSITION, firstListPosition);
 
 
 
