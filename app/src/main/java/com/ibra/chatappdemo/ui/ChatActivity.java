@@ -57,12 +57,12 @@ public class ChatActivity extends AppCompatActivity {
     private  int pageNumber = 1;
     private Toolbar mToolbar;
     private TextView nameTxt,lastseenTxt;
-    private ImageView image;
+    private CircleImageView image;
     private EditText messageTxt;
     private Button sendImageBtn;
     private RecyclerView messageList;
     private MessageAdapter messageAdapter;
-    private ArrayList<Message> messages;
+    private ArrayList<Message> messages = new ArrayList<>();
 //    private SwipeRefreshLayout mSwipeRefreshLayout;
 //    private int pos = 0;
 //    private int firstListPosition;
@@ -113,7 +113,7 @@ public class ChatActivity extends AppCompatActivity {
         messageList.setLayoutManager(new LinearLayoutManager(this));
         messageList.setHasFixedSize(true);
         messages = new ArrayList<>();
-        messageAdapter = new MessageAdapter(this);
+        messageAdapter = new MessageAdapter(this,messages);
         messageList.setAdapter(messageAdapter);
 
 

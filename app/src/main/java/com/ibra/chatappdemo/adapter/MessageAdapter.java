@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,11 +34,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
     private String messageImage;
 
 
-    public MessageAdapter(Context context) {
+    public MessageAdapter(Context context,ArrayList<Message>messages) {
         this.context = context;
         currentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-
+        this.messages = messages;
     }
 
 
@@ -48,8 +48,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
     @Override
     public MessageHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Log.d("frommessageadapter","onCreateViewHolder");
-            // user send message
-            return new MessageHolder(LayoutInflater.from(context).inflate(R.layout.message_list_item_user,parent,false));
+        if(viewType == 1) {
+            return new MessageHolder(LayoutInflater.from(context).inflate(R.layout.message_list_item_user, parent, false));
+        }else return new MessageHolder(LayoutInflater.from(context).inflate(R.layout.message_list_item_friend, parent, false));
+
 
     }
 
@@ -60,10 +62,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
     }
 
     public void notifyAdapter(ArrayList<Message>messages){
-        if(this.messages != messages){
-            this.messages = messages;
-            this.notifyDataSetChanged();
-        }
+       this.messages = messages;
+       this.notifyDataSetChanged();
     }
 
     @Override
@@ -73,15 +73,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
         else return 0;
     }
 
-//    @Override
-//    public int getItemViewType(int position) {
-//        Log.d("frommessageadapter","getItemViewType");
-//        String from_user_id = messages.get(position).getFrom();
-//        if(from_user_id != null && from_user_id.equals(currentId)){
-//            return 1;
-//        }else return 2;
-//
-//    }
+    @Override
+    public int getItemViewType(int position) {
+        Log.d("frommessageadapter","getItemViewType");
+        String from_user_id = messages.get(position).getFrom();
+        if(from_user_id != null && from_user_id.equals(currentId)){
+            return 1;
+        }else return 2;
+
+    }
 
     public class MessageHolder extends RecyclerView.ViewHolder{
 
@@ -98,11 +98,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
 
         public void bind(int position){
             Log.d("frommessageadapter","bind");
-
             String from_user_id = messages.get(position).getFrom();
-
-
-
             if(from_user_id.equals(currentId)){
                 DatabaseReference currentUserRef = FirebaseDatabase.getInstance().getReference().child(context.getString(R.string.users_table)).child(currentId);
                 currentUserRef.addValueEventListener(new ValueEventListener() {
