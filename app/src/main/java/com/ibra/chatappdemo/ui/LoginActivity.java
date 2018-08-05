@@ -112,7 +112,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnFocusChan
         String email = emailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
         if(TextUtils.isEmpty(email) || TextUtils.isEmpty(password)){
-            Toast.makeText(this, "please enter email and password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.invalid_email_pass), Toast.LENGTH_SHORT).show();
         }else{
             progressDialog.setMessage(getString(R.string.login_dialog_message));
             progressDialog.show();
@@ -191,7 +191,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnFocusChan
             String email = emailEditText.getText().toString();
             if(!TextUtils.isEmpty(email))
                 restorePassword(email);
-            else Toast.makeText(this, "invalid email", Toast.LENGTH_SHORT).show();
+            else Toast.makeText(this, getString(R.string.invalid_email), Toast.LENGTH_SHORT).show();
         }
     }
 

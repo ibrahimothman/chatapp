@@ -16,8 +16,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -55,21 +57,21 @@ public class ChatActivity extends AppCompatActivity {
     private  int pageNumber = 1;
     private Toolbar mToolbar;
     private TextView nameTxt,lastseenTxt;
-    private CircleImageView image;
+    private ImageView image;
     private EditText messageTxt;
-    private Button sendImageBtn,takeImageBtn;
+    private Button sendImageBtn;
     private RecyclerView messageList;
     private MessageAdapter messageAdapter;
     private ArrayList<Message> messages;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private int pos = 0;
-    private int firstListPosition;
+//    private SwipeRefreshLayout mSwipeRefreshLayout;
+//    private int pos = 0;
+//    private int firstListPosition;
 
 
 
 
 
-    RelativeLayout chatLayout;
+//    RelativeLayout chatLayout;
 
     private DatabaseReference mRootRef;
 
@@ -104,7 +106,7 @@ public class ChatActivity extends AppCompatActivity {
 
         messageTxt = (EditText)findViewById(R.id.message_edit_text);
         sendImageBtn = (Button) findViewById(R.id.send_message_btn);
-        mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh_layout);
+//        mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh_layout);
 
         // recycler view
         messageList = (RecyclerView)findViewById(R.id.messages_list);
@@ -115,16 +117,16 @@ public class ChatActivity extends AppCompatActivity {
         messageList.setAdapter(messageAdapter);
 
 
-        chatLayout = (RelativeLayout)findViewById(R.id.chat_activity);
+//        chatLayout = (RelativeLayout)findViewById(R.id.chat_activity);
 
 
 
-        if(savedInstanceState != null){
-            Log.d("fromchatactivity","saved is not null");
-            pageNumber = savedInstanceState.getInt(FINAL_PAGE_NUMBER);
-            firstListPosition = savedInstanceState.getInt(FIRST_LIST_POSITION);
-            Log.d("fromchatactivity","fromoncreatepositionis"+ firstListPosition);
-        }
+//        if(savedInstanceState != null){
+//            Log.d("fromchatactivity","saved is not null");
+//            pageNumber = savedInstanceState.getInt(FINAL_PAGE_NUMBER);
+//            firstListPosition = savedInstanceState.getInt(FIRST_LIST_POSITION);
+//            Log.d("fromchatactivity","fromoncreatepositionis"+ firstListPosition);
+//        }else firstListPosition = 0;
 
 
 
@@ -137,9 +139,9 @@ public class ChatActivity extends AppCompatActivity {
             Log.d(TAG,"friendid is "+friendId);
         }else {
             Bundle bundle = getIntent().getExtras();
-            if(bundle != null && bundle.getString("from_user_id") != null){
+            if(bundle != null && bundle.getString(getString(R.string.from_user_id)) != null){
                 Log.d(TAG,"fromuserprofile not null");
-                friendId = bundle.getString("from_user_id");
+                friendId = bundle.getString(getString(R.string.from_user_id));
             }else Log.d(TAG,"fromuserprofile is null");
 
         }
@@ -153,40 +155,11 @@ public class ChatActivity extends AppCompatActivity {
         // get friend info
         mRootRef = FirebaseDatabase.getInstance().getReference();
 
-        // when current open chat set seen true
-        mRootRef.child("Chat").child(currentId).child(friendId).child("seen").setValue(true);
-
-        // if current not has friend as child
-        mRootRef.child("Chat").child(currentId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.hasChild(friendId)){
-                    Map chatUserMap = new HashMap();
-                    chatUserMap.put("Chat/" + currentId + "/" + friendId+"/"+"seen", false);
-                    chatUserMap.put("Chat/" + friendId + "/" + currentId+"/"+"timestamp", ServerValue.TIMESTAMP);
-
-                    mRootRef.updateChildren(chatUserMap, new DatabaseReference.CompletionListener() {
-                        @Override
-                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                            if(databaseError != null){
-
-                                Log.d("CHAT_LOG", databaseError.getMessage().toString());
-
-                            }
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
 
 
-        mRootRef.child("users").child(friendId).addValueEventListener(new ValueEventListener() {
+
+        mRootRef.child(getString(R.string.users_table)).child(friendId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot != null) {
@@ -195,30 +168,27 @@ public class ChatActivity extends AppCompatActivity {
                     userImage = dataSnapshot.child(getString(R.string.thumb_image_key)).getValue().toString();
                     nameTxt.setText(userName);
                     Picasso.get().load(userImage).placeholder(R.drawable.thumb_default_image).into(image);
-
-                    onlineState = dataSnapshot.child("online").getValue().toString();
-                    if (onlineState != null) {
-                        Log.d("fromChatActivity", "onlinestat not null");
-                        if (onlineState.equals("true")) {
-                            lastseenTxt.setText("online");
-                        } else {
-                            Long timeAgo = Long.parseLong(onlineState);
-                            lastseenTxt.setText(TimeAgo.getTimeAgo(timeAgo,ChatActivity.this));
-                            Log.d("fromchatActivity",TimeAgo.getTimeAgo(timeAgo,ChatActivity.this));
-                        }
-                    }else Log.d("fromChatActivity", "onlinestate  null");
+                    if(dataSnapshot.hasChild(getString(R.string.online))){
+                        onlineState = dataSnapshot.child(getString(R.string.online)).getValue().toString();
+                        if (onlineState != null) {
+                            Log.d("fromChatActivity", "onlinestat not null");
+                            if (onlineState.equals("true")) {
+                                lastseenTxt.setText(R.string.online);
+                            } else {
+                                Long timeAgo = Long.parseLong(onlineState);
+                                lastseenTxt.setText(TimeAgo.getTimeAgo(timeAgo));
+                                Log.d("fromchatActivity", TimeAgo.getTimeAgo(timeAgo));
+                            }
+                        } else Log.d("fromChatActivity", "onlinestate  null");
+                    }
                 }else Log.d("fromChatActivity", "data  null");
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Toast.makeText(getApplicationContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
             }
         });
-
-
-
-
 
 
 
@@ -234,16 +204,16 @@ public class ChatActivity extends AppCompatActivity {
 
 
 
-
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                pageNumber++;
-                Log.d("fromchatactivity","from onrefresh page is "+pageNumber);
-                pos = 0;
-                loadMoreMessage();
-            }
-        });
+//
+//        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                pageNumber++;
+//                Log.d("fromchatactivity","from onrefresh page is "+pageNumber);
+//                pos = 0;
+//                loadMoreMessage();
+//            }
+//        });
 
 
     }
@@ -281,17 +251,17 @@ public class ChatActivity extends AppCompatActivity {
             messageMap.put(notificationRef+"/"+pushId+"/"+"not_type","message");
 
             // conversation
-            mRootRef.child("Chat").child(currentId).child(friendId).child("seen").setValue(true);
-            mRootRef.child("Chat").child(currentId).child(friendId).child("timestamp").setValue(System.currentTimeMillis()*-1);
+            mRootRef.child(getString(R.string.chat_table)).child(currentId).child(friendId).child(getString(R.string.seen)).setValue(true);
+            mRootRef.child(getString(R.string.chat_table)).child(currentId).child(friendId).child(getString(R.string.time_stamp)).setValue(System.currentTimeMillis()*-1);
 
-            mRootRef.child("Chat").child(friendId).child(currentId).child("seen").setValue(false);
-            mRootRef.child("Chat").child(friendId).child(currentId).child("timestamp").setValue(System.currentTimeMillis()*-1);
+            mRootRef.child(getString(R.string.chat_table)).child(friendId).child(currentId).child(getString(R.string.seen)).setValue(false);
+            mRootRef.child(getString(R.string.chat_table)).child(friendId).child(currentId).child(getString(R.string.time_stamp)).setValue(System.currentTimeMillis()*-1);
 
             mRootRef.updateChildren(messageMap, new DatabaseReference.CompletionListener() {
                 @Override
                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                    if(databaseError != null){
-                       Log.d(TAG,"error is"+databaseError.getMessage().toString());
+                       Toast.makeText(getApplicationContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
                    } else{
                         messageTxt.setText("");
 //                        messageList.scrollToPosition(messages.size() - 1);
@@ -320,17 +290,21 @@ public class ChatActivity extends AppCompatActivity {
                         if (message != null) {
                             Log.d(TAG, "message is " + message.getMessage());
                             messages.add(message);
-                            pos++;
-                            if (pos == 1) {
-                                lastItemKey = dataSnapshot.getKey();
-                                prevItemKey = dataSnapshot.getKey();
-                                Log.d(TAG, "lastKeyIs " + lastItemKey);
-                            }
+                            Log.d(TAG,"message "+message.getMessage());
+
+//                            pos++;
+//                            if (pos == 1) {
+//                                lastItemKey = dataSnapshot.getKey();
+//                                prevItemKey = dataSnapshot.getKey();
+//                                Log.d(TAG, "lastKeyIs " + lastItemKey);
+//                            }
 
                             messageAdapter.notifyAdapter(messages);
-                            Log.d("fromchatactivity","firstpositionis"+ firstListPosition);
-                            messageList.scrollToPosition(firstListPosition);
-                            mSwipeRefreshLayout.setRefreshing(false);
+//                            Log.d("fromchatactivity","firstpositionis"+ firstListPosition);
+//                            if(firstListPosition >= 0) {
+//                                messageList.scrollToPosition(firstListPosition);
+//                            }
+//                            mSwipeRefreshLayout.setRefreshing(false);
 
                         }
                     }
@@ -371,20 +345,20 @@ public class ChatActivity extends AppCompatActivity {
                     Message message = dataSnapshot.getValue(Message.class);
                     if(message != null){
                         Log.d(TAG,"message is "+message.getMessage());
-                        if(!prevItemKey.equals(dataSnapshot.getKey())){
-                            messages.add(pos++,message);
-                        }else{
-                            prevItemKey = lastItemKey;
-                        }
+//                        if(!prevItemKey.equals(dataSnapshot.getKey())){
+//                            messages.add(pos++,message);
+//                        }else{
+//                            prevItemKey = lastItemKey;
+//                        }
 
-                        if(pos == 1){
-                            lastItemKey = dataSnapshot.getKey();
-                            Log.d(TAG,"lastKeyIs "+lastItemKey);
-                        }
+//                        if(pos == 1){
+//                            lastItemKey = dataSnapshot.getKey();
+//                            Log.d(TAG,"lastKeyIs "+lastItemKey);
+//                        }
 
                         messageAdapter.notifyDataSetChanged();
 //                        messageList.scrollToPosition(messages.size() - 1);
-                        mSwipeRefreshLayout.setRefreshing(false);
+//                        mSwipeRefreshLayout.setRefreshing(false);
                     }
                 }
             }
@@ -418,9 +392,9 @@ public class ChatActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         Log.d("fromchatactivity","from onsaved page is "+pageNumber);
         outState.putInt(FINAL_PAGE_NUMBER,pageNumber);
-        firstListPosition = ((LinearLayoutManager)messageList.getLayoutManager()).findFirstVisibleItemPosition();
-        Log.d("fromchatactivity","from onsaved firstvisible is "+ firstListPosition);
-        outState.putInt(FIRST_LIST_POSITION, firstListPosition);
+//        firstListPosition = ((LinearLayoutManager)messageList.getLayoutManager()).findFirstVisibleItemPosition();
+//        Log.d("fromchatactivity","from onsaved firstvisible is "+ firstListPosition);
+//        outState.putInt(FIRST_LIST_POSITION, firstListPosition);
 
 
 

@@ -48,11 +48,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
     @Override
     public MessageHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Log.d("frommessageadapter","onCreateViewHolder");
-        if(viewType == 1){
             // user send message
             return new MessageHolder(LayoutInflater.from(context).inflate(R.layout.message_list_item_user,parent,false));
-        }else
-            return new MessageHolder(LayoutInflater.from(context).inflate(R.layout.message_list_item_friend,parent,false));
+
     }
 
     @Override
@@ -75,15 +73,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
         else return 0;
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        Log.d("frommessageadapter","getItemViewType");
-        String from_user_id = messages.get(position).getFrom();
-        if(from_user_id != null && from_user_id.equals(currentId)){
-            return 1;
-        }else return 2;
-
-    }
+//    @Override
+//    public int getItemViewType(int position) {
+//        Log.d("frommessageadapter","getItemViewType");
+//        String from_user_id = messages.get(position).getFrom();
+//        if(from_user_id != null && from_user_id.equals(currentId)){
+//            return 1;
+//        }else return 2;
+//
+//    }
 
     public class MessageHolder extends RecyclerView.ViewHolder{
 
@@ -106,7 +104,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
 
 
             if(from_user_id.equals(currentId)){
-                DatabaseReference currentUserRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentId);
+                DatabaseReference currentUserRef = FirebaseDatabase.getInstance().getReference().child(context.getString(R.string.users_table)).child(currentId);
                 currentUserRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -129,7 +127,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
 
                 }
             else{
-                DatabaseReference friendUserRef = FirebaseDatabase.getInstance().getReference().child("users").child(from_user_id);
+                DatabaseReference friendUserRef = FirebaseDatabase.getInstance().getReference().child(context.getString(R.string.users_table)).child(from_user_id);
                 friendUserRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {

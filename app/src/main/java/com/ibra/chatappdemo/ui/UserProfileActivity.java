@@ -180,7 +180,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 negativebtn.setVisibility(View.GONE);
                 positiveBtn.setEnabled(true);
                 positiveBtn.setVisibility(View.VISIBLE);
-                positiveBtn.setText("view profile");
+                positiveBtn.setText(R.string.view_profile);
                 state = 4;
             }
 
@@ -287,9 +287,9 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         // first send request
         Map<String,Object> sendMap = new HashMap();
         sendMap.put(getString(R.string.friend_req_table)+"/"+currentUid+"/"+profileUid+"/"+
-                    getString(R.string.request_type),"send");
+                    getString(R.string.request_type),getString(R.string.send));
         sendMap.put(getString(R.string.friend_req_table)+"/"+profileUid+"/"+currentUid+"/"+
-                getString(R.string.request_type),"receive");
+                getString(R.string.request_type),getString(R.string.receive));
 
         sendMap.put(getString(R.string.notification_table)+"/"+profileUid+"/"+notificationId+"/"+"from",currentUid);
         sendMap.put(getString(R.string.notification_table)+"/"+profileUid+"/"+notificationId+"/"+"not_type","request");
@@ -350,6 +350,13 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         unfriendMap.put(getString(R.string.friends_table)+"/"+currentUid+"/"+profileUid,null);
 
         unfriendMap.put(getString(R.string.friends_table)+"/"+profileUid+"/"+currentUid,null);
+        unfriendMap.put(getString(R.string.chat_table)+"/"+currentUid+"/"+profileUid,null);
+
+        unfriendMap.put(getString(R.string.chat_table)+"/"+profileUid+"/"+currentUid,null);
+
+        unfriendMap.put(getString(R.string.messages_table)+"/"+currentUid+"/"+profileUid,null);
+
+        unfriendMap.put(getString(R.string.messages_table)+"/"+profileUid+"/"+currentUid,null);
 
 
         rootRef.updateChildren(unfriendMap, new DatabaseReference.CompletionListener() {

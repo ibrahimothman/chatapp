@@ -6,6 +6,7 @@
     android:background="@color/colorPrimary">
 
     <de.hdodenhof.circleimageview.CircleImageView
+        android:contentDescription="@string/profile_image"
         android:id="@+id/image_chat_bar"
         android:layout_width="49dp"
         android:layout_height="62dp"
@@ -13,14 +14,12 @@
 
         android:layout_alignParentTop="true"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight= "16dp"
         tools:src="@drawable/thumb_default_image" />
 
     <TextView
         android:id="@+id/username_chat_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ahmed adel"
         android:textSize="18sp"
         android:layout_marginTop="10dp"
         />
@@ -30,10 +29,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="32dp"
-        android:text="online"
         android:textSize="16sp"
         />
 

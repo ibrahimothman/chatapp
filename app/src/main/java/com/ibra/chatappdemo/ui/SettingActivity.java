@@ -93,16 +93,18 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
 
 
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("users").child(uid);
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.users_table)).child(uid);
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                User user =  dataSnapshot.getValue(User.class);
-                String name = user.getuName();
-                String status = user.getuStatus();
-                String image = user.getuImage();
-                String mobile = user.getuPhone();
-                updateUi(name,image,status,mobile);
+                if (dataSnapshot.getValue(User.class) != null) {
+                    User user = dataSnapshot.getValue(User.class);
+                    String name = user.getuName();
+                    String status = user.getuStatus();
+                    String image = user.getuImage();
+                    String mobile = user.getuPhone();
+                    updateUi(name, image, status, mobile);
+                }
 
             }
 
@@ -120,7 +122,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         mUserStatusText.setText(status);
         mUserMobileText.setText(mobile);
 
-        if(!image.equals("default")) {
+        if(image != null &&!image.equals("default")) {
             Log.d(TAG,"imageis "+image);
             Picasso.get().load(image).placeholder(R.drawable.main_default_image).into(profileImage);
         }
@@ -153,7 +155,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
             Intent galleryIntent = new Intent();
             galleryIntent.setType("image/*");
             galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(galleryIntent, "Select Picture"), PICK_IMAGE);
+            startActivityForResult(Intent.createChooser(galleryIntent, getString(R.string.select_image)), PICK_IMAGE);
         }
     }
 
@@ -205,7 +207,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                     savethumbImage(thumbnail_bitmap);
 
                 }
-                else Toast.makeText(SettingActivity.this, "Error! try again", Toast.LENGTH_SHORT).show();
+                else Toast.makeText(SettingActivity.this,getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -249,8 +251,8 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
                             mProgressDialoge.dismissProgressDialoge();
-                            Toast.makeText(SettingActivity.this, "image has changed", Toast.LENGTH_SHORT).show();
-                        }else Toast.makeText(SettingActivity.this, "Error! try again", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SettingActivity.this, getString(R.string.image_has_changed), Toast.LENGTH_SHORT).show();
+                        }else Toast.makeText(SettingActivity.this, getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
                     }
                 });
     }

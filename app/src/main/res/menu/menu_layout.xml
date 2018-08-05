@@ -7,11 +7,11 @@
         android:id="@+id/setting_option"
         android:orderInCategory="1"/>
 
-    <item android:title="All users"
+    <item android:title="@string/all_users_option_menu"
         android:id="@+id/allusers_option"
         android:orderInCategory="2"/>
 
-    <item android:title="sign out"
+    <item android:title="@string/sign_out_option_menu"
         android:id="@+id/signout_option"
         android:orderInCategory="3"/>
 

@@ -59,7 +59,7 @@ public class RequestFragment extends Fragment  {
 
     private ArrayList<User> users = new ArrayList<>();
     private ArrayList<String> ids = new ArrayList<>();
-    private int listPosition ;
+    private int listPosition = 0 ;
 
 
     public RequestFragment() {
@@ -85,60 +85,65 @@ public class RequestFragment extends Fragment  {
             listPosition = savedInstanceState.getInt(LIST_POSITION);
         }else listPosition = 0;
 
+        if(getActivity() != null) {
 
-        userRef = FirebaseDatabase.getInstance().getReference().child("users");
+            userRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.users_table));
 
-        currentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        requestRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.friend_req_table))
-                .child(currentId);
+            currentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            requestRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.friend_req_table))
+                    .child(currentId);
 
-        requestRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("fromRequestFragment","inside ondatachange");
-                users.clear();
-                ids.clear();
-//                requestAdapter.notifyDataSetChanged();
-                saveRequestIntoSharedPref();
-                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    if (data != null) {
-                        Request request = data.getValue(Request.class);
-                        if (request.getRequest_type().equals("receive")) {
-                            final String friendId = data.getKey();
-                            userRef.child(friendId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    Log.d("fromRequestFragment","insideondatachange2");
-                                    if (dataSnapshot != null) {
-                                        User user = dataSnapshot.getValue(User.class);
-                                        users.add(user);
-                                        ids.add(friendId);
-                                        Log.d("fromRequestFragment","usersize is"+users.size());
-                                        Log.d("fromRequestFragment","friendId is "+friendId);
-                                        requestAdapter.notifyAdapter(users,ids);
+            requestRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.d("fromRequestFragment", "inside ondatachange");
+                    users.clear();
+                    ids.clear();
+                    requestAdapter.notifyDataSetChanged();
+                    saveRequestIntoSharedPref();
+                    for (DataSnapshot data : dataSnapshot.getChildren()) {
+                        if (data != null && getActivity() != null) {
+                            Request request = data.getValue(Request.class);
+                            if (request.getRequest_type().equals(getString(R.string.receive))) {
+                                final String friendId = data.getKey();
+                                userRef.child(friendId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        Log.d("fromRequestFragment", "insideondatachange2");
+                                        if (dataSnapshot != null) {
+                                            User user = dataSnapshot.getValue(User.class);
+                                            users.add(user);
+                                            ids.add(friendId);
+                                            Log.d("fromRequestFragment", "usersize is" + users.size());
+                                            Log.d("fromRequestFragment", "friendId is " + friendId);
+                                            requestAdapter.notifyAdapter(users, ids);
 //                                        Log.d("fromRequestFragment","listpositionis "+listPosition);
-                                        requestList.smoothScrollToPosition(listPosition);
-                                        saveRequestIntoSharedPref();
+                                            if (listPosition >= 0) {
+                                                requestList.smoothScrollToPosition(listPosition);
+                                            }
+                                            saveRequestIntoSharedPref();
 
+                                        }
                                     }
-                                }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                    Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
-                                }
-                            });
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
                         }
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
-            }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
+                }
 
-        });
+            });
+
+        }
 
         return view;
     }

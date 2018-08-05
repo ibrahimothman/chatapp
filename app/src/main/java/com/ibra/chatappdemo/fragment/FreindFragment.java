@@ -59,7 +59,7 @@ public class FreindFragment extends Fragment {
     private String friendId;
     private String currentId;
     private User user;
-    private int listPosition;
+    private int listPosition = 0;
 
 
     public FreindFragment() {
@@ -74,67 +74,68 @@ public class FreindFragment extends Fragment {
         friendList.setLayoutManager(new LinearLayoutManager(getContext()));
         friendList.setHasFixedSize(true);
 
+        if(getActivity() != null) {
 
-        if(FirebaseAuth.getInstance().getCurrentUser() != null) {
-            currentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            friendDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.friends_table))
-                    .child(currentId);
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                currentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                friendDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.friends_table))
+                        .child(currentId);
 
-            FirebaseRecyclerAdapter<Friend, FriendListHolder> adapter =
-                    new FirebaseRecyclerAdapter<Friend, FriendListHolder>(
-                            Friend.class, R.layout.user_list_item, FriendListHolder.class, friendDatabase
-                    ) {
-                        @Override
-                        protected void populateViewHolder(final FriendListHolder viewHolder, final Friend model, int position) {
-                            final String friendId = getRef(position).getKey();
+                FirebaseRecyclerAdapter<Friend, FriendListHolder> adapter =
+                        new FirebaseRecyclerAdapter<Friend, FriendListHolder>(
+                                Friend.class, R.layout.user_list_item, FriendListHolder.class, friendDatabase
+                        ) {
+                            @Override
+                            protected void populateViewHolder(final FriendListHolder viewHolder, final Friend model, int position) {
+                                final String friendId = getRef(position).getKey();
 
-                            userDatabase = FirebaseDatabase.getInstance().getReference().child("users").child(friendId);
-                            userDatabase.addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    if (dataSnapshot != null) {
-                                        user = dataSnapshot.getValue(User.class);
-                                        viewHolder.friendName.setText(user.getuName());
-                                        Picasso.get().load(user.getuThumb()).placeholder(R.drawable.thumb_default_image).into(viewHolder.friendImage);
-                                        viewHolder.date.setText(model.getDate());
+                                userDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.users_table)).child(friendId);
+                                userDatabase.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot != null) {
+                                            user = dataSnapshot.getValue(User.class);
+                                            viewHolder.friendName.setText(user.getuName());
+                                            Picasso.get().load(user.getuThumb()).placeholder(R.drawable.thumb_default_image).into(viewHolder.friendImage);
+                                            viewHolder.date.setText(model.getDate());
 
-                                        if (dataSnapshot.hasChild("online")) {
-                                            if (dataSnapshot.child("online").getValue().equals("true")) {
-                                                viewHolder.onlineIcon.setVisibility(View.VISIBLE);
+                                            if (dataSnapshot.hasChild(getString(R.string.online))) {
+                                                if (dataSnapshot.child(getString(R.string.online)).getValue().equals("true")) {
+                                                    viewHolder.onlineIcon.setVisibility(View.VISIBLE);
+                                                } else
+                                                    viewHolder.onlineIcon.setVisibility(View.INVISIBLE);
                                             } else
                                                 viewHolder.onlineIcon.setVisibility(View.INVISIBLE);
-                                        } else viewHolder.onlineIcon.setVisibility(View.INVISIBLE);
+
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
 
                                     }
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                    Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
-
-                                }
-                            });
+                                });
 
                                 viewHolder.view.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-                                        String[] options = {"view profile","send message"};
+                                        String[] options = {"view profile", "send message"};
                                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                                         builder.setTitle(R.string.choose_option_dialoge);
                                         builder.setItems(options, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
-                                                if(i == 0){
+                                                if (i == 0) {
                                                     // view profile
-                                                    Intent userProfileIntent = new Intent(getContext(),UserProfileActivity.class);
-                                                    userProfileIntent.putExtra(AllusersActivity.USER_ID_EXTRA,friendId);
+                                                    Intent userProfileIntent = new Intent(getContext(), UserProfileActivity.class);
+                                                    userProfileIntent.putExtra(AllusersActivity.USER_ID_EXTRA, friendId);
                                                     getActivity().startActivity(userProfileIntent);
-                                                }
-                                                else if(i == 1){
+                                                } else if (i == 1) {
                                                     // send message
-                                                    Intent userProfileIntent = new Intent(getContext(),ChatActivity.class);
-                                                    userProfileIntent.putExtra(AllusersActivity.USER_ID_EXTRA,friendId);
-                                                    Log.d("fromfriendfragment","friendId is "+friendId);
+                                                    Intent userProfileIntent = new Intent(getContext(), ChatActivity.class);
+                                                    userProfileIntent.putExtra(AllusersActivity.USER_ID_EXTRA, friendId);
+                                                    Log.d("fromfriendfragment", "friendId is " + friendId);
                                                     getActivity().startActivity(userProfileIntent);
                                                 }
                                             }
@@ -143,18 +144,22 @@ public class FreindFragment extends Fragment {
                                     }
                                 });
 
-                        }
-                    };
+                            }
+                        };
 
 
-            // get list position after rotation
-            if(savedInstanceState != null){
-                Log.d("fromRequestFragment","savedInstanceState not null");
-                listPosition = savedInstanceState.getInt(LIST_POSITION);
-            }else listPosition = 0;
+                // get list position after rotation
+                if (savedInstanceState != null) {
+                    Log.d("fromRequestFragment", "savedInstanceState not null");
+                    listPosition = savedInstanceState.getInt(LIST_POSITION);
+                } else listPosition = 0;
 
-            friendList.smoothScrollToPosition(listPosition);
-            friendList.setAdapter(adapter);
+                if (listPosition >= 0) {
+                    friendList.smoothScrollToPosition(listPosition);
+                }
+                friendList.setAdapter(adapter);
+            }
+
         }
 
         return view;

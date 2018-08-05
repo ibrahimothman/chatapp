@@ -19,22 +19,22 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:id="@+id/login_layout"
-        android:paddingTop="90dp"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp">
+        android:paddingTop="@dimen/login_layout_padding_top"
+        android:paddingStart="@dimen/login_layout_padding_left"
+        android:paddingEnd="@dimen/login_layout_padding_right">
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="@dimen/text_input_layout_margin_top"
+            android:layout_marginBottom="@dimen/text_input_layout_margin_bottom"
             android:id="@+id/email_textInputLayout"
             app:errorTextAppearance="@style/erroStyle">
 
             <android.support.v7.widget.AppCompatEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email"
+                android:hint="@string/email_edit_hint"
                 android:id="@+id/email_edittext"
                 android:inputType="textEmailAddress"
                 android:textColor="@android:color/holo_red_light"
@@ -44,15 +44,15 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="@dimen/text_input_layout_margin_top"
+            android:layout_marginBottom="@dimen/text_input_layout_margin_bottom"
             android:id="@+id/pass_textInputLayout"
             app:errorTextAppearance="@style/erroStyle">
 
             <android.support.v7.widget.AppCompatEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="password"
+                android:hint="@string/password_edit_hint"
                 android:id="@+id/password_edittext"
                 android:inputType="textPassword"
                 android:textColor="@android:color/holo_red_light"
@@ -63,21 +63,21 @@
             android:id="@+id/btn_login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:padding="12dp"
-            android:text="Login"
+            android:layout_marginTop="@dimen/app_compat_margin_top"
+            android:layout_marginBottom="@dimen/app_compat_margin_bottom"
+            android:padding="@dimen/app_compat_padding"
+            android:text="@string/login_button_text"
             android:background="@color/colorPrimaryDark"
             android:textColor="@android:color/white"/>
 
         <TextView android:id="@+id/forget_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:text="forget password?"
+            android:layout_marginBottom="@dimen/app_compat_margin_top"
+            android:text="@string/forget_password_button"
             android:gravity="center"
             android:textColor="@color/colorAccent"
-            android:textSize="16sp"/>
+            android:textSize="@dimen/text_size_16"/>
 
     </LinearLayout>
 

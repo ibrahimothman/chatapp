@@ -11,6 +11,7 @@
 
 
     <de.hdodenhof.circleimageview.CircleImageView
+        android:contentDescription="@string/image"
         android:id="@+id/user_image_list"
         android:layout_width="64dp"
         android:layout_height="64dp"
@@ -35,7 +36,7 @@
         app:layout_constraintLeft_toLeftOf="@+id/user_image_list"
         app:layout_constraintStart_toEndOf="@+id/user_image_list"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Mama" />
+        />
 
     <TextView
         android:id="@+id/user_status_list"
@@ -46,14 +47,14 @@
         android:textColor="@android:color/black"
         app:layout_constraintStart_toStartOf="@+id/user_name_list"
         app:layout_constraintTop_toBottomOf="@+id/user_name_list"
-        tools:text="نبتنيتبنتيبتب" />
+         />
 
     <ImageView
+        android:contentDescription="@string/online_icon"
         android:id="@+id/online_icon"
         android:layout_width="10dp"
         android:layout_height="10dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="7dp"
         android:src="@drawable/online_icon"

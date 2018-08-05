@@ -101,14 +101,14 @@ public class ChangeInfoActivity extends AppCompatActivity implements View.OnClic
     // update status
     private void changeInfo(String keyChanged,int inputType) {
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        mDatabaseStatus = FirebaseDatabase.getInstance().getReference().child("users")
+        mDatabaseStatus = FirebaseDatabase.getInstance().getReference().child(getString(R.string.users_table))
                 .child(uid).child(keyChanged);
 
 //        changeInfotxt.setInputType(inputType);
         changeInfotxt.setRawInputType(inputType);
         newInfo = changeInfotxt.getText().toString();
         if(TextUtils.isEmpty(newInfo)){
-            Toast.makeText(this, "please enter somethig", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.invalid_input), Toast.LENGTH_LONG).show();
         }else{
             // setup progress dialoge
             mProgressDialoge = new ProgressDialoge(this);
@@ -118,7 +118,7 @@ public class ChangeInfoActivity extends AppCompatActivity implements View.OnClic
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()){
                         mProgressDialoge.dismissProgressDialoge();
-                        Toast.makeText(ChangeInfoActivity.this, "status changed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ChangeInfoActivity.this, getString(R.string.status_changed), Toast.LENGTH_SHORT).show();
                         onBackPressed();
                     }else{
                         Toast.makeText(ChangeInfoActivity.this, getString(R.string.error_msg), Toast.LENGTH_SHORT).show();

@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements IntefaceListener.
 
         if(!prefStart.isFirstTime_app()){
             startActivity(new Intent(this,StartActivity.class));
+            finish();
         }
 
         //setup toolbar
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements IntefaceListener.
 
 
         // initialize ads
-        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
+        MobileAds.initialize(this, getString(R.string.ad_unit_id));
 
         // load banner ads
         AdView mAdView = findViewById(R.id.adView);
@@ -153,13 +154,13 @@ public class MainActivity extends AppCompatActivity implements IntefaceListener.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.alert_signout);
         builder.setCancelable(false);
-        builder.setPositiveButton("sure", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.sure, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 signout();
             }
         });
-        builder.setNegativeButton("No",null);
+        builder.setNegativeButton(R.string.no,null);
         builder.show();
     }
 

@@ -144,7 +144,7 @@ View.OnFocusChangeListener{
         String email = emailEditText.getText().toString();
         String pass = passwordEditText.getText().toString();
         if(TextUtils.isEmpty(email) || TextUtils.isEmpty(pass) || TextUtils.isEmpty(name)){
-            Toast.makeText(this, "please enter email and password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.invalid_email_pass), Toast.LENGTH_SHORT).show();
         }else{
             progressDialog.setMessage(getString(R.string.create_account_dialog_message));
             progressDialog.show();
@@ -175,7 +175,7 @@ View.OnFocusChangeListener{
 
     private void saveUserInfoIntoDB(String uid,String userName) {
         mDatabase = FirebaseDatabase.getInstance().getReference()
-                .child("users").child(uid);
+                .child(getString(R.string.users_table)).child(uid);
         User user = new User();
         user.setuName(userName);
         user.setuStatus(getString(R.string.default_status));
@@ -188,7 +188,7 @@ View.OnFocusChangeListener{
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
                     String deviceToken = FirebaseInstanceId.getInstance().getToken();
-                    FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid()).child("device_token").setValue(deviceToken);
+                    FirebaseDatabase.getInstance().getReference().child(getString(R.string.users_table)).child(mAuth.getCurrentUser().getUid()).child("device_token").setValue(deviceToken);
                     launchMainActivity();
                 } else
                     Toast.makeText(RegisterActivity.this, getString(R.string.register_error), Toast.LENGTH_SHORT).show();

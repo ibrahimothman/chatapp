@@ -9,15 +9,14 @@
     >
 <android.support.constraint.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#f5f5f5
-">
+    android:layout_height="wrap_content"
+    android:background="@color/setting_layout_background">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/appbarlayout"
-        android:elevation="8dp">
+        >
         <include layout="@layout/toolbar_layout"
             android:id="@+id/toolbar"
             />
@@ -28,14 +27,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <de.hdodenhof.circleimageview.CircleImageView
+        android:contentDescription="@string/setting_profile_image"
         android:id="@+id/image_profile"
-        android:layout_width="192dp"
-        android:layout_height="184dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="30dp"
+        android:layout_width="@dimen/setting_profile_image_width"
+        android:layout_height="@dimen/setting_profile_image_height"
+        android:layout_marginEnd="@dimen/setting_profile_image_margin_end"
+        android:layout_marginStart="@dimen/setting_profile_image_margin_start"
+        android:layout_marginTop="@dimen/setting_profile_image_margin_top"
         android:src="@drawable/main_default_image"
         android:background="@drawable/back_circle"
         app:layout_constraintEnd_toEndOf="parent"
@@ -50,29 +48,29 @@
         android:layout_height="wrap_content"
         android:id="@+id/username_layout"
         android:orientation="horizontal"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/setting_name_layout_margin_top"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/image_profile">
         <TextView
             android:id="@+id/username_text_profile"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/zero_width"
             android:layout_weight="5"
             android:layout_height="match_parent"
             android:background="@drawable/white_rec"
-            android:padding="10dp"
-            tools:text="ibrahim korayem"
-            android:textSize="20sp"
+            android:padding="@dimen/setting_name_padding"
+            android:textSize="@dimen/text_size_20"
             android:textColor="@android:color/black"
              />
 
         <ImageView
-            android:layout_width="0dp"
+            android:contentDescription="@string/edit_name"
+            android:layout_width="@dimen/zero_width"
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:background="@drawable/white_rec"
             android:src="@drawable/ic_mode_edit_black_24dp"
-            android:padding="15dp"
+            android:padding="@dimen/setting_edit_padding"
             android:id="@+id/change_name_profile"
             />
     </LinearLayout>
@@ -86,9 +84,9 @@
         android:layout_marginTop="10dp"
         android:background="@drawable/white_rec"
         android:padding="15dp"
-        android:text="About and phone number"
-        android:textColor="#e53935"
-        android:textSize="18sp"
+        android:text="@string/about_and_phone_number"
+        android:textColor="@color/about_text_color"
+        android:textSize="@dimen/text_size_18"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/username_layout" />
@@ -110,11 +108,12 @@
             android:textColor="@android:color/black"
             android:background="@drawable/white_rec"
             android:padding="15dp"
-            android:text="Hey there! i am using WhatsApp. "
+            android:text="@string/default_status"
             android:textSize="16sp"
             />
 
         <ImageView
+            android:contentDescription="@string/edit_status"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
@@ -145,12 +144,12 @@
             android:background="@drawable/white_rec"
             android:layout_marginTop="1dp"
             android:padding="15dp"
-            android:text="+20 100 986 8412"
             android:textSize="18sp"
             android:textColor="@android:color/black"
             />
 
         <ImageView
+            android:contentDescription="@string/edit_mobile_number"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
@@ -165,15 +164,15 @@
 
 
     <android.support.design.widget.FloatingActionButton
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/fab_width"
+        android:layout_height="@dimen/fab_height"
         android:id="@+id/change_image_fab"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="@dimen/fab_margin"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginLeft="@dimen/fab_margin"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:layout_marginTop="@dimen/fab_margin"
         android:src="@drawable/ic_photo_camera_black_24dp"
         app:layout_constraintBottom_toTopOf="@+id/username_layout"
         app:layout_constraintEnd_toEndOf="parent"

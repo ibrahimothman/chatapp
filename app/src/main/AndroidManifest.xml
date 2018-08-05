@@ -6,8 +6,17 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE"/>
+    <permission
+        android:name="${applicationId}.permission.C2D_MESSAGE"
+        android:protectionLevel="signature"/>
+
+
+
+
+
     <application
-        android:name=".ui.ChatApp"
         android:allowBackup="true"
         android:hardwareAccelerated="false"
         android:icon="@mipmap/ic_launcher"
@@ -16,7 +25,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.MainActivity">
+        <activity android:name=".ui.MainActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,11 +35,14 @@
         </activity>
         <activity
             android:name=".ui.LoginActivity"
+            android:screenOrientation="portrait"
             android:parentActivityName=".ui.StartActivity" />
         <activity
             android:name=".ui.RegisterActivity"
+            android:screenOrientation="portrait"
             android:parentActivityName=".ui.StartActivity" />
-        <activity android:name=".ui.StartActivity" />
+        <activity android:name=".ui.StartActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.SettingActivity"
             android:parentActivityName=".ui.MainActivity" />

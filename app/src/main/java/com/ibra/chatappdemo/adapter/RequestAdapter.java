@@ -3,6 +3,7 @@ package com.ibra.chatappdemo.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,14 +27,15 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestH
     private ArrayList<User> users;
     private IntefaceListener.acceptFriendRequest acceptListener;
     private IntefaceListener.declineFriendRequest declineListener;
-    private String cuurentId,friendId;
+    private String cuurentId;
+    private ArrayList<String> friendIds;
 
-    public RequestAdapter(Context context, ArrayList<User> users, String friendId) {
+    public RequestAdapter(Context context, ArrayList<User> users) {
         this.context = context;
         this.users = users;
         acceptListener = (IntefaceListener.acceptFriendRequest) context;
         declineListener = (IntefaceListener.declineFriendRequest) context;
-        this.friendId = friendId;
+//        this.friendId = friendId;
         cuurentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
@@ -45,7 +47,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestH
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RequestHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RequestHolder holder, final int position) {
         holder.name.setText(users.get(position).getuName());
         Picasso.get().load(users.get(position).getuThumb()).placeholder(R.drawable.thumb_default_image)
                 .into(holder.image);
@@ -53,21 +55,23 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestH
         holder.decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                declineListener.onDeclineRequest(cuurentId,friendId);
+                declineListener.onDeclineRequest(cuurentId,friendIds.get(position));
             }
         });
 
         holder.accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                acceptListener.onAcceptRequest(cuurentId,friendId);
+                acceptListener.onAcceptRequest(cuurentId,friendIds.get(position));
             }
         });
     }
 
-    public void notifyAdapter(String friendId){
-        if(this.friendId == null) {
-            this.friendId = friendId;
+    public void notifyAdapter(ArrayList<User> users, ArrayList<String> friendIds){
+        if(friendIds != null && users != null) {
+            Log.d("fromRequestFragment","fromanotifiyadapterdapter");
+            this.friendIds = friendIds;
+            this.users = users;
             this.notifyDataSetChanged();
         }
 
@@ -76,7 +80,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestH
 
     @Override
     public int getItemCount() {
-        if (users.size() != 0 && users != null)return users.size();
+        if (users.size() != 0 )return users.size();
         else return 0;
     }
 

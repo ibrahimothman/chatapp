@@ -63,7 +63,7 @@ public class ChatFragment extends Fragment {
     private DatabaseReference mUserRef;
     private RecyclerView chatList;
 
-    private int listPosition ;
+    private int listPosition = 0 ;
 
 
     public ChatFragment() {
@@ -89,102 +89,102 @@ public class ChatFragment extends Fragment {
             listPosition = savedInstanceState.getInt(LIST_POSITION);
         }else listPosition = 0;
 
+        if(getActivity() != null) {
 
+            mAuth = FirebaseAuth.getInstance();
+            if (mAuth.getCurrentUser() != null) {
+                currentUserId = mAuth.getCurrentUser().getUid();
+                mUserRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.users_table));
 
-        mAuth = FirebaseAuth.getInstance();
-        if(mAuth.getCurrentUser() != null){
-            currentUserId = mAuth.getCurrentUser().getUid();
-            mUserRef = FirebaseDatabase.getInstance().getReference().child("users");
+                messageRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.messages_table))
+                        .child(currentUserId);
 
-            messageRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.messages_table))
-                    .child(currentUserId);
+                mChatRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.chat_table)).child(currentUserId);
 
-            mChatRef = FirebaseDatabase.getInstance().getReference().child("Chat").child(currentUserId);
+                Query mChatquery = mChatRef.orderByChild(getString(R.string.time_stamp));
 
-            Query mChatquery = mChatRef.orderByChild("timestamp");
+                FirebaseRecyclerAdapter<Chat, ChatViewHolder> adapter = new FirebaseRecyclerAdapter<Chat, ChatViewHolder>(
+                        Chat.class, R.layout.user_list_item, ChatViewHolder.class, mChatquery
+                ) {
+                    @Override
+                    protected void populateViewHolder(final ChatViewHolder viewHolder, Chat model, int position) {
+                        Log.d("fromchatfragment", "load data");
+                        final String friendId = getRef(position).getKey();
+                        final boolean isSeen = model.isSeen();
+                        final Long time = model.getTimestamp();
 
-            FirebaseRecyclerAdapter<Chat,ChatViewHolder> adapter = new FirebaseRecyclerAdapter<Chat, ChatViewHolder>(
-                    Chat.class,R.layout.user_list_item,ChatViewHolder.class,mChatquery
-            ) {
-                @Override
-                protected void populateViewHolder(final ChatViewHolder viewHolder, Chat model, int position) {
-                    Log.d("fromchatfragment","load data");
-                    final String friendId = getRef(position).getKey();
-                    final boolean isSeen = model.isSeen();
-                    final Long time = model.getTimestamp();
-
-                    // get last message
-                    Query lastMessage = messageRef.child(friendId).limitToLast(1);
-                    lastMessage.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for(DataSnapshot data : dataSnapshot.getChildren()) {
-                                String message = data.child("message").getValue().toString();
-                                viewHolder.setMessage(message, String.valueOf(isSeen));
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-
-                    mUserRef.child(friendId).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if(getActivity() != null) {
-                                if(dataSnapshot.hasChild(getString(R.string.username_key))) {
-                                    String name = dataSnapshot.child(getString(R.string.username_key)).getValue().toString();
-                                    viewHolder.setName(name);
+                        // get last message
+                        Query lastMessage = messageRef.child(friendId).limitToLast(1);
+                        lastMessage.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                                    String message = data.child(getString(R.string.message_child)).getValue().toString();
+                                    viewHolder.setMessage(message, String.valueOf(isSeen));
                                 }
-                                if(dataSnapshot.hasChild(getString(R.string.thumb_image_key))) {
-                                    String image = dataSnapshot.child(getString(R.string.thumb_image_key)).getValue().toString();
-                                    viewHolder.setImage(image);
-                                }
-                                if (dataSnapshot.hasChild("online")) {
-
-                                    String onlineState = dataSnapshot.child("online").getValue().toString();
-                                    viewHolder.setOnlineIcon(onlineState);
-
-                                }
-
-
-
                             }
 
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
+                            }
+                        });
 
-                            viewHolder.mView.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
 
+                        mUserRef.child(friendId).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (getActivity() != null) {
+                                    if (dataSnapshot.hasChild(getString(R.string.username_key))) {
+                                        String name = dataSnapshot.child(getString(R.string.username_key)).getValue().toString();
+                                        viewHolder.setName(name);
+                                    }
+                                    if (dataSnapshot.hasChild(getString(R.string.thumb_image_key))) {
+                                        String image = dataSnapshot.child(getString(R.string.thumb_image_key)).getValue().toString();
+                                        viewHolder.setImage(image);
+                                    }
+                                    if (dataSnapshot.hasChild(getString(R.string.online))) {
 
-                                    Intent chatIntent = new Intent(getContext(), ChatActivity.class);
-                                    chatIntent.putExtra(AllusersActivity.USER_ID_EXTRA, friendId);
-                                    startActivity(chatIntent);
+                                        String onlineState = dataSnapshot.child(getString(R.string.online)).getValue().toString();
+                                        viewHolder.setOnlineIcon(onlineState);
+
+                                    }
+
 
                                 }
-                            });
 
-                        }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
-                        }
-                    });
+                                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
 
+
+                                        Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                                        chatIntent.putExtra(AllusersActivity.USER_ID_EXTRA, friendId);
+                                        startActivity(chatIntent);
+
+                                    }
+                                });
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                    }
+
+
+                };
+                if (listPosition >= 0) {
+                    chatList.smoothScrollToPosition(listPosition);
                 }
+                chatList.setAdapter(adapter);
 
 
-            };
-            chatList.smoothScrollToPosition(listPosition);
-            chatList.setAdapter(adapter);
-
-
-
-
+            }
         }
 
 

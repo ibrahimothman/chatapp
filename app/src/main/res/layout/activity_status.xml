@@ -17,16 +17,17 @@
 
 
     <EditText
+        android:hint="@string/change_your_setting"
         android:id="@+id/change_status_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="70dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:padding="10dp"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        tools:text="dsadsadsadasd" />
+         />
 
     <View
         android:layout_width="match_parent"
@@ -45,14 +46,15 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="5"
-            android:text="Cancel"
+            android:text="@string/cancel"
             android:id="@+id/cancel"
             android:background="@null"/>
 
         <ImageView
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@android:color/black"/>
+            android:background="@android:color/black"
+            android:contentDescription="@string/todo" />
 
 
 
@@ -60,7 +62,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="5"
-            android:text="OK"
+            android:text="@string/ok"
             android:id="@+id/ok"
             android:background="@null"/>
 

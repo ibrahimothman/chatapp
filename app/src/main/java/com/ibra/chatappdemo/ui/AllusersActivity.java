@@ -69,7 +69,7 @@ public class AllusersActivity extends AppCompatActivity {
         currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         // get reference from database
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.users_table));
 
 
         adapter = new FirebaseRecyclerAdapter<User, UserListViewHolder>(
@@ -105,7 +105,9 @@ public class AllusersActivity extends AppCompatActivity {
 
         usersList.setAdapter(adapter);
         Log.d(TAG,"listpositionis "+listPosition);
-        usersList.smoothScrollToPosition(listPosition);
+        if(listPosition >= 0) {
+            usersList.smoothScrollToPosition(listPosition);
+        }
 
 
     }

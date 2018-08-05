@@ -11,9 +11,8 @@ public class TimeAgo  {
     private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
 
 
-    public static String getTimeAgo(long time, Context ctx) {
+    public static String getTimeAgo(long time) {
         if (time < 1000000000000L) {
-            // if timestamp given in seconds, convert to millis
             time *= 1000;
         }
 
@@ -22,7 +21,7 @@ public class TimeAgo  {
             return null;
         }
 
-        // TODO: localize
+
         final long diff = now - time;
         if (diff < MINUTE_MILLIS) {
             return "just now";
