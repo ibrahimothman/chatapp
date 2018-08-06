@@ -115,21 +115,19 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
         public void bind(int position){
             Log.d("frommessageadapter","bind");
             String from_user_id = messages.get(position).getFrom();
-            if(from_user_id.equals(currentId)){
-                DatabaseReference currentUserRef = FirebaseDatabase.getInstance().getReference().child(context.getString(R.string.users_table)).child(currentId);
-                currentUserRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot != null){
-                            currentUserImage = dataSnapshot.child(context.getString(R.string.thumb_image_key)).getValue().toString();
-                            name = dataSnapshot.child(context.getString(R.string.username_key)).getValue().toString();
-                            nameTxt.setText(name);
-                            Log.d("fromAdapter","current is "+name);
-                            if(currentUserImage != null){
-                                Picasso.get().load(currentUserImage).placeholder(R.drawable.thumb_default_image).into(image); }
-//                                notifyDataSetChanged();
-                            }
+            DatabaseReference currentUserRef = FirebaseDatabase.getInstance().getReference().child(context.getString(R.string.users_table)).child(from_user_id);
+            currentUserRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot != null){
+                        currentUserImage = dataSnapshot.child(context.getString(R.string.thumb_image_key)).getValue().toString();
+                        name = dataSnapshot.child(context.getString(R.string.username_key)).getValue().toString();
+                        nameTxt.setText(name);
+                        Log.d("fromAdapter","current is "+name);
+                        if(currentUserImage != null){
+                            Picasso.get().load(currentUserImage).placeholder(R.drawable.thumb_default_image).into(image);
                         }
+                    } }
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
@@ -138,36 +136,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
                     });
 
 
-
-                }
-            else{
-                DatabaseReference friendUserRef = FirebaseDatabase.getInstance().getReference().child(context.getString(R.string.users_table)).child(from_user_id);
-                friendUserRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot != null){
-                            friendImage = dataSnapshot.child(context.getString(R.string.thumb_image_key)).getValue().toString();
-                            name = dataSnapshot.child(context.getString(R.string.username_key)).getValue().toString();
-                            nameTxt.setText(name);
-                            Log.d("fromAdapter","friend is "+name);
-                            if(friendImage != null){
-                                Picasso.get().load(friendImage).placeholder(R.drawable.thumb_default_image).into(image);
-                            }
-//                            notifyDataSetChanged();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-            }
-
             String messageTime = TimeAgo.getTimeAgo(Long.parseLong(messages.get(position).getTime()));
             timeTxt.setText(messageTime);
-            content.setText(messages.get(position).getMessage());
+            if(messages.get(position).getType().equals("text")) {
+                content.setText(messages.get(position).getMessage());
+            }else{
+                Picasso.get().load(messages.get(position).getMessage()).placeholder(R.drawable.thumb_default_image).into(messageImageview);
+
+            }
 
 
 

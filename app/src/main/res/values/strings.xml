@@ -99,6 +99,7 @@
     <string name="send">send</string>
     <string name="view_profile">view profile</string>
     <string name="message_child">message</string>
+    <string name="messages_image">messages_image</string>
 
 
 </resources>

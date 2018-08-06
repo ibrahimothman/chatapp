@@ -2,6 +2,9 @@ package com.ibra.chatappdemo.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +24,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -29,12 +34,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.ibra.chatappdemo.R;
 import com.ibra.chatappdemo.adapter.MessageAdapter;
+import com.ibra.chatappdemo.dialog.ProgressDialoge;
 import com.ibra.chatappdemo.helper.TimeAgo;
 import com.ibra.chatappdemo.model.Message;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,6 +87,8 @@ public class ChatActivity extends AppCompatActivity {
     String onlineState,userName,userImage;
     private String lastItemKey,prevItemKey;
     private StorageReference imageStorageRef;
+    private ProgressDialoge mProgressDialoge;
+    private Bitmap thumbnail_bitmap;
 
 
     @Override
@@ -203,7 +214,7 @@ public class ChatActivity extends AppCompatActivity {
         sendImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendImage();
+                pickupImage();
             }
         });
 
@@ -222,8 +233,102 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-    private void sendImage() {
-        
+    private void pickupImage() {
+        // pick an image from gallery
+        Intent galleryIntent = new Intent();
+        galleryIntent.setType("image/*");
+        galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(galleryIntent, getString(R.string.select_image)), PICK_IMAGE);
+    }
+
+    // when image picked and return to app
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
+            Uri imageUri = data.getData();
+            CropImage.activity(imageUri)
+                    .start(this);
+        }
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                mProgressDialoge = new ProgressDialoge(this);
+                mProgressDialoge.showProgressDialoge(getString(R.string.waiting));
+                Uri resultUri = result.getUri();
+                saveImageProfile(resultUri);
+
+            }
+
+        }
+    }
+
+    private void saveImageProfile(Uri resultUri) {
+        DatabaseReference user_message_push = mRootRef.child(getString(R.string.messages_table))
+                .child(currentId).child(friendId).push();
+
+        final String pushKey = user_message_push.getKey();
+
+        StorageReference mainImageRef = FirebaseStorage.getInstance().getReference().child(getString(R.string.messages_image))
+                .child(pushKey+".jpg");
+
+        mainImageRef.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if(task.isSuccessful()) {
+                    String mainImageLink = task.getResult().getDownloadUrl().toString();
+                    Log.d(TAG,"imagelink "+mainImageLink);
+                    sendImage(mainImageLink,pushKey);
+
+                }
+                else Toast.makeText(ChatActivity.this,getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void sendImage(String mainImageLink,String pushId) {
+        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        mgr.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        Message message = new Message();
+        message.setMessage(mainImageLink);
+        message.setSeen("false");
+        message.setTime(String.valueOf(System.currentTimeMillis()*-1));
+        message.setType("image");
+        message.setFrom(currentId);
+        message.setTime(String.valueOf(System.currentTimeMillis()));
+
+
+        String current_user_ref = getString(R.string.messages_table)+"/"+currentId+"/"+friendId;
+        String friend_user_ref = getString(R.string.messages_table)+"/"+friendId+"/"+currentId;
+
+        String notificationRef = getString(R.string.notification_table)+"/"+friendId;
+
+        Map<String,Object> messageMap = new HashMap<>();
+
+            // messages
+        messageMap.put(current_user_ref+"/"+pushId,message);
+        messageMap.put(friend_user_ref+"/"+pushId,message);
+
+            // notification
+        messageMap.put(notificationRef+"/"+pushId+"/"+"from",currentId);
+        messageMap.put(notificationRef+"/"+pushId+"/"+"not_type","message");
+
+            // conversation
+        mRootRef.child(getString(R.string.chat_table)).child(currentId).child(friendId).child(getString(R.string.seen)).setValue(true);
+        mRootRef.child(getString(R.string.chat_table)).child(currentId).child(friendId).child(getString(R.string.time_stamp)).setValue(System.currentTimeMillis()*-1);
+
+        mRootRef.child(getString(R.string.chat_table)).child(friendId).child(currentId).child(getString(R.string.seen)).setValue(false);
+        mRootRef.child(getString(R.string.chat_table)).child(friendId).child(currentId).child(getString(R.string.time_stamp)).setValue(System.currentTimeMillis()*-1);
+
+        mRootRef.updateChildren(messageMap, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if(databaseError != null){
+                        Toast.makeText(getApplicationContext(), getString(R.string.error_msg), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+
     }
 
     private void makeMessageSeen() {
