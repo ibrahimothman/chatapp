@@ -276,6 +276,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                 if(task.isSuccessful()) {
+                    mProgressDialoge.dismissProgressDialoge();
                     String mainImageLink = task.getResult().getDownloadUrl().toString();
                     Log.d(TAG,"imagelink "+mainImageLink);
                     sendImage(mainImageLink,pushKey);
