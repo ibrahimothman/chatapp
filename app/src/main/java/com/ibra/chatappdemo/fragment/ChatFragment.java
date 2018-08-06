@@ -120,7 +120,8 @@ public class ChatFragment extends Fragment {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                                     String message = data.child(getString(R.string.message_child)).getValue().toString();
-                                    viewHolder.setMessage(message, String.valueOf(isSeen));
+                                    String type = data.child("type").getValue().toString();
+                                    viewHolder.setMessage(message,type, String.valueOf(isSeen));
                                 }
                             }
 
@@ -208,12 +209,14 @@ public class ChatFragment extends Fragment {
             onlineIcon = (ImageView) itemView.findViewById(R.id.online_icon);
         }
 
-        public void setMessage(String message,String isSeen) {
+        public void setMessage(String message,String type, String isSeen) {
             Log.d("fromchatfragment","seen is "+isSeen);
             if (isSeen.equals("true")){
                 messageTxt.setTypeface(messageTxt.getTypeface(),Typeface.NORMAL);
             }else  messageTxt.setTypeface(messageTxt.getTypeface(),Typeface.BOLD);
-            messageTxt.setText(message);
+            if(type.equals("text"))messageTxt.setText(message);
+            else if(type.equals("image"))messageTxt.setText("photo");
+
         }
 
         public void setName(String name) {
