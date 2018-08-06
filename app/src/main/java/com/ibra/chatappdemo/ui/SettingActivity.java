@@ -289,7 +289,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         Log.d("test","main stop");
         try {
             if(currentUser != null && !OnlineHelper.isOnForeground(this)) {
-                mDatabase.child("online").setValue("false");
+                mDatabase.child("online").setValue(String.valueOf(System.currentTimeMillis()));
             }
         } catch (ExecutionException e) {
             e.printStackTrace();

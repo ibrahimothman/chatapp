@@ -273,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements IntefaceListener.
         try {
             if(currentUser != null && !OnlineHelper.isOnForeground(this)) {
                 rootRef.child(getString(R.string.users_table))
-                        .child(currentId).child("online").setValue("false");
+                        .child(currentId).child("online").setValue(String.valueOf(System.currentTimeMillis()));
             }
         } catch (ExecutionException e) {
             e.printStackTrace();

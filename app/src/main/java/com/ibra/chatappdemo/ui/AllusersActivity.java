@@ -156,7 +156,7 @@ public class AllusersActivity extends AppCompatActivity {
         public void setOnlineIcon(String online) {
             if(online.equals("true")){
                 onlineIcon.setVisibility(View.VISIBLE);
-            }else if(online.equals("false")){
+            }else {
                 onlineIcon.setVisibility(View.GONE);
             }
         }
@@ -195,7 +195,7 @@ public class AllusersActivity extends AppCompatActivity {
         Log.d("test","main stop");
         try {
             if(currentUser != null && !OnlineHelper.isOnForeground(this)) {
-                mDatabase.child(currentUid).child("online").setValue("false");
+                mDatabase.child(currentUid).child("online").setValue(String.valueOf(System.currentTimeMillis()));
             }
         } catch (ExecutionException e) {
             e.printStackTrace();
