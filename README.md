@@ -19,8 +19,10 @@ float="left">
 <img width=400 height=680 src="https://user-images.githubusercontent.com/26088754/43352416-4c4e819e-9223-11e8-828f-7664de697644.png">
 <img width=400 height=680 src="https://user-images.githubusercontent.com/26088754/43352419-4cace1bc-9223-11e8-8639-cc8e2542c8ed.png">  
 </p>
-float="left">
-<img width=400 height=680 src="https://user-images.githubusercontent.com/26088754/43735428-e11f89aa-99ba-11e8-94cf-4de3f07c2a21.png">  
+
+<p float="left">
+<img width=400 height=680 src="https://user-images.githubusercontent.com/26088754/43735428-e11f89aa-99ba-11e8-94cf-4de3f07c2a21.png">
+<img width=400 height=680 src="https://user-images.githubusercontent.com/26088754/43735485-038ef8cc-99bb-11e8-8e3d-75eac16b8ac5.png">
 </p>
 
 
