@@ -273,7 +273,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         Log.d("test","main start");
         try {
             if(currentUser != null && OnlineHelper.isOnForeground(this)){
-                mDatabase.child("online").setValue(true);
+                mDatabase.child("online").setValue("true");
             }
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -289,7 +289,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         Log.d("test","main stop");
         try {
             if(currentUser != null && !OnlineHelper.isOnForeground(this)) {
-                mDatabase.child("online").setValue(false);
+                mDatabase.child("online").setValue("false");
             }
         } catch (ExecutionException e) {
             e.printStackTrace();

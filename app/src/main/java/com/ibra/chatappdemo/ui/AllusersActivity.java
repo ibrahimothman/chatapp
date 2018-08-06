@@ -1,6 +1,5 @@
 package com.ibra.chatappdemo.ui;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,8 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -93,6 +92,10 @@ public class AllusersActivity extends AppCompatActivity {
 
                 viewHolder.setStatus(model.getuStatus());
 
+                if(model.getOnline() != null){
+                    viewHolder.setOnlineIcon(model.getOnline());
+                }
+
                 if(model.getuThumb() != null && !model.getuThumb().equals("default"))
                     viewHolder.setImage(model.getuThumb());
 
@@ -122,6 +125,7 @@ public class AllusersActivity extends AppCompatActivity {
 
 
         CircleImageView image;
+        ImageView onlineIcon;
         TextView name;
         TextView status;
         View mView;
@@ -131,6 +135,7 @@ public class AllusersActivity extends AppCompatActivity {
             image =(CircleImageView) itemView.findViewById(R.id.user_image_list);
             name =(TextView) itemView.findViewById(R.id.user_name_list);
             status =(TextView) itemView.findViewById(R.id.user_status_list);
+            onlineIcon =(ImageView) itemView.findViewById(R.id.online_icon);
 
 
         }
@@ -146,6 +151,14 @@ public class AllusersActivity extends AppCompatActivity {
 
         public void setImage(String s) {
             Picasso.get().load(s).placeholder(R.drawable.thumb_default_image).into(image);
+        }
+
+        public void setOnlineIcon(String online) {
+            if(online.equals("true")){
+                onlineIcon.setVisibility(View.VISIBLE);
+            }else if(online.equals("false")){
+                onlineIcon.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -166,7 +179,7 @@ public class AllusersActivity extends AppCompatActivity {
         Log.d("test","main start");
         try {
             if(currentUser != null && OnlineHelper.isOnForeground(this)){
-                mDatabase.child(currentUid).child("online").setValue(true);
+                mDatabase.child(currentUid).child("online").setValue("true");
             }
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -182,7 +195,7 @@ public class AllusersActivity extends AppCompatActivity {
         Log.d("test","main stop");
         try {
             if(currentUser != null && !OnlineHelper.isOnForeground(this)) {
-                mDatabase.child(currentUid).child("online").setValue(false);
+                mDatabase.child(currentUid).child("online").setValue("false");
             }
         } catch (ExecutionException e) {
             e.printStackTrace();

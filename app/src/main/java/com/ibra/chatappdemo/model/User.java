@@ -8,17 +8,28 @@ public class User {
     private String uStatus;
     private String uPhone;
     private String uThumb;
+    private String online;
 
-    public User(String uId, String uName, String uImage, String uStatus, String uPhone, String thumb) {
+    public User(String uId, String uName, String uImage, String uStatus, String uPhone, String thumb,String onlineIcon) {
         this.uId = uId;
         this.uName = uName;
         this.uImage = uImage;
         this.uStatus = uStatus;
         this.uPhone = uPhone;
         this.uThumb = thumb;
+        this.online = onlineIcon;
     }
 
+
     public User() {
+    }
+
+    public String getOnline() {
+        return online;
+    }
+
+    public void setOnline(String online) {
+        this.online = online;
     }
 
     public String getuThumb() {

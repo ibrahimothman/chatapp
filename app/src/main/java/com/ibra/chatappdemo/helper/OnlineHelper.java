@@ -41,7 +41,7 @@ public class OnlineHelper extends Application {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             // if user close app
-                            userReference.child("online").onDisconnect().setValue(false);
+                            userReference.child("online").onDisconnect().setValue("false");
 
                         }
 
