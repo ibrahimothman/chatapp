@@ -5,29 +5,36 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+
 import android.widget.TextView;
 
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.ibra.chatappdemo.R;
+import com.ibra.chatappdemo.adapter.SearchAdapter;
 import com.ibra.chatappdemo.helper.OnlineHelper;
 import com.ibra.chatappdemo.model.User;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class AllusersActivity extends AppCompatActivity {
+public class AllusersActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     private static final String TAG = AllusersActivity.class.getCanonicalName();
     public static final String USER_ID_EXTRA = "user_id_for_profile_activity";
@@ -39,10 +46,11 @@ public class AllusersActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private static String currentUid;
     FirebaseUser currentUser;
+    SearchView mSearchView;
 
 
-    ArrayList<User> users = new ArrayList<>();
-    FirebaseRecyclerAdapter<User,UserListViewHolder> adapter;
+    List<User> users = new ArrayList<>();
+    SearchAdapter searchAdapter ;
     private int listPosition = 0;
 
 
@@ -60,7 +68,13 @@ public class AllusersActivity extends AppCompatActivity {
         // setup users recycler view
         usersList = (RecyclerView)findViewById(R.id.alluser_list);
         usersList.setLayoutManager(new LinearLayoutManager(this));
+        searchAdapter = new SearchAdapter(users,this);
+        usersList.setAdapter(searchAdapter);
         usersList.setHasFixedSize(true);
+
+        // setup search view
+        mSearchView = (SearchView)findViewById(R.id.search_view);
+        mSearchView.setOnQueryTextListener(this);
 
         // get list position after rotation
         if(savedInstanceState != null){
@@ -77,90 +91,48 @@ public class AllusersActivity extends AppCompatActivity {
 
 
 
-        adapter = new FirebaseRecyclerAdapter<User, UserListViewHolder>(
-                User.class,R.layout.user_list_item,UserListViewHolder.class,mDatabase
-        ) {
+
+
+
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String s) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String s) {
+        if(!s.isEmpty()){
+            searchUsers(s);
+        }
+        return true;
+    }
+
+
+    public void  searchUsers(final String s){
+        users.clear();
+        mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
-            protected void populateViewHolder(UserListViewHolder viewHolder, User model, int position) {
-                Log.d(TAG,"insidepopulate");
-                final String profileUid = getRef(position).getKey();
-
-                if(profileUid.equals(currentUid)){
-                    Log.d(TAG,"yourprofile");
-                    viewHolder.setName("You");
-                }else viewHolder.setName(model.getuName());
-
-                viewHolder.setStatus(model.getuStatus());
-
-                if(model.getOnline() != null){
-                    viewHolder.setOnlineIcon(model.getOnline());
-                }
-
-                if(model.getuThumb() != null && !model.getuThumb().equals("default"))
-                    viewHolder.setImage(model.getuThumb());
-
-                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent userProfileIntent = new Intent(getApplicationContext(),UserProfileActivity.class);
-                        userProfileIntent.putExtra(USER_ID_EXTRA,profileUid);
-                        startActivity(userProfileIntent);
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot data : dataSnapshot.getChildren()){
+                    User user = data.getValue(User.class);
+                    if(user.getuName().contains(s)) {
+                        Log.d(TAG,"useris "+user.getuName());
+                        user.setuId(data.getKey());
+                        users.add(user);
+                        searchAdapter.notify(users);
                     }
-                });
+                }
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
             }
-        };
-
-        usersList.setAdapter(adapter);
-        Log.d(TAG,"listpositionis "+listPosition);
-        if(listPosition >= 0) {
-            usersList.smoothScrollToPosition(listPosition);
-        }
-
-
+        });
     }
 
-    public static  class UserListViewHolder extends RecyclerView.ViewHolder{
-
-
-        CircleImageView image;
-        ImageView onlineIcon;
-        TextView name;
-        TextView status;
-        View mView;
-        public UserListViewHolder(View itemView) {
-            super(itemView);
-            mView = itemView;
-            image =(CircleImageView) itemView.findViewById(R.id.user_image_list);
-            name =(TextView) itemView.findViewById(R.id.user_name_list);
-            status =(TextView) itemView.findViewById(R.id.user_status_list);
-            onlineIcon =(ImageView) itemView.findViewById(R.id.online_icon);
-
-
-        }
-
-        public void setName(String s) {
-
-            name.setText(s);
-        }
-
-        public void setStatus(String s) {
-            status.setText(s);
-        }
-
-        public void setImage(String s) {
-            Picasso.get().load(s).placeholder(R.drawable.thumb_default_image).into(image);
-        }
-
-        public void setOnlineIcon(String online) {
-            if(online.equals("true")){
-                onlineIcon.setVisibility(View.VISIBLE);
-            }else {
-                onlineIcon.setVisibility(View.GONE);
-            }
-        }
-    }
 
 
     @Override
