@@ -2,8 +2,6 @@ package com.ibra.chatappdemo.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.NavUtils;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,7 +16,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +28,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.ibra.chatappdemo.R;
@@ -39,7 +36,6 @@ import com.ibra.chatappdemo.helper.TimeAgo;
 import com.ibra.chatappdemo.model.Message;
 import com.squareup.picasso.Picasso;
 
-import java.lang.annotation.Native;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,7 +57,8 @@ public class ChatActivity extends AppCompatActivity {
     private TextView nameTxt,lastseenTxt;
     private CircleImageView image;
     private EditText messageTxt;
-    private Button sendImageBtn;
+    private Button sendBtn;
+    ImageButton sendImageBtn;
     private RecyclerView messageList;
     private MessageAdapter messageAdapter;
     private ArrayList<Message> messages = new ArrayList<>();
@@ -107,7 +104,8 @@ public class ChatActivity extends AppCompatActivity {
         image = (CircleImageView)chatBar.findViewById(R.id.image_chat_bar);
 
         messageTxt = (EditText)findViewById(R.id.message_edit_text);
-        sendImageBtn = (Button) findViewById(R.id.send_message_btn);
+        sendBtn = (Button) findViewById(R.id.send_message_btn);
+        sendImageBtn = (ImageButton) findViewById(R.id.send_image_btn);
         mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh_layout);
 
         // recycler view
@@ -160,8 +158,6 @@ public class ChatActivity extends AppCompatActivity {
         // make message seen when user open chat
         makeMessageSeen();
 
-
-
         mRootRef.child(getString(R.string.users_table)).child(friendId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -198,15 +194,18 @@ public class ChatActivity extends AppCompatActivity {
         retreiveMessages();
 
 
-        sendImageBtn.setOnClickListener(new View.OnClickListener() {
+        sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sendMessage();
             }
         });
-
-
-
+        sendImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendImage();
+            }
+        });
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -221,6 +220,10 @@ public class ChatActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private void sendImage() {
+        
     }
 
     private void makeMessageSeen() {

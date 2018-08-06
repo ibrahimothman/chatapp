@@ -50,9 +50,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
     @Override
     public MessageHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Log.d("frommessageadapter","onCreateViewHolder");
-        if(viewType == 1) {
-            return new MessageHolder(LayoutInflater.from(context).inflate(R.layout.message_list_item_user, parent, false));
-        }else return new MessageHolder(LayoutInflater.from(context).inflate(R.layout.message_list_item_friend, parent, false));
+        if(viewType == 1)return new MessageHolder(LayoutInflater.from(context).inflate(R.layout.message_list_item_user, parent, false));
+        else if(viewType == 2) return new MessageHolder(LayoutInflater.from(context).inflate(R.layout.message_list_item_friend, parent, false));
+        else if(viewType == 3) return new MessageHolder(LayoutInflater.from(context).inflate(R.layout.message_list_item_user_image, parent, false));
+        else if(viewType == 4) return new MessageHolder(LayoutInflater.from(context).inflate(R.layout.message_list_item_friend_image, parent, false));
+        else return null;
 
 
     }
@@ -79,9 +81,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
     public int getItemViewType(int position) {
         Log.d("frommessageadapter","getItemViewType");
         String from_user_id = messages.get(position).getFrom();
-        if(from_user_id != null && from_user_id.equals(currentId)){
-            return 1;
-        }else return 2;
+        if(from_user_id != null){
+            if(from_user_id.equals(currentId)){
+                if(messages.get(position).getType().equals("text"))return 1; // user_text
+                else return 3; // user_image
+            }else{
+                if(messages.get(position).getType().equals("text")) return 2; // friend_text
+                else return 4; //friend_image
+            }
+        }else return 0;
+
 
     }
 
@@ -90,6 +99,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
         TextView content;
         CircleImageView image;
         TextView nameTxt,timeTxt;
+        ImageView messageImageview;
 
         public MessageHolder(View itemView) {
             super(itemView);
@@ -97,6 +107,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageH
             image = (CircleImageView) itemView.findViewById(R.id.image_message);
             nameTxt = (TextView) itemView.findViewById(R.id.text_message_name);
             timeTxt = (TextView) itemView.findViewById(R.id.text_message_time);
+            messageImageview = (ImageView) itemView.findViewById(R.id.chat_message_image);
 
         }
 
