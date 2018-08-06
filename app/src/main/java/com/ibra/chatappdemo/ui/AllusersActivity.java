@@ -15,13 +15,16 @@ import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.ibra.chatappdemo.R;
+import com.ibra.chatappdemo.helper.OnlineHelper;
 import com.ibra.chatappdemo.model.User;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -36,6 +39,7 @@ public class AllusersActivity extends AppCompatActivity {
     private RecyclerView usersList;
     private DatabaseReference mDatabase;
     private static String currentUid;
+    FirebaseUser currentUser;
 
 
     ArrayList<User> users = new ArrayList<>();
@@ -66,10 +70,12 @@ public class AllusersActivity extends AppCompatActivity {
 
 
         // get current user id
-        currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        currentUid = currentUser.getUid();
 
         // get reference from database
         mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.users_table));
+
 
 
         adapter = new FirebaseRecyclerAdapter<User, UserListViewHolder>(
@@ -154,6 +160,36 @@ public class AllusersActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("test","main start");
+        try {
+            if(currentUser != null && OnlineHelper.isOnForeground(this)){
+                mDatabase.child(currentUid).child("online").setValue(true);
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("test","main stop");
+        try {
+            if(currentUser != null && !OnlineHelper.isOnForeground(this)) {
+                mDatabase.child(currentUid).child("online").setValue(false);
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }

@@ -24,6 +24,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,6 +35,7 @@ import com.ibra.chatappdemo.adapter.ViewPagerAdapter;
 import com.ibra.chatappdemo.fragment.ChatFragment;
 import com.ibra.chatappdemo.fragment.FreindFragment;
 import com.ibra.chatappdemo.fragment.RequestFragment;
+import com.ibra.chatappdemo.helper.OnlineHelper;
 import com.ibra.chatappdemo.listener.IntefaceListener;
 import com.ibra.chatappdemo.preferenceManage.SharedPreferenceStart;
 import com.ibra.chatappdemo.service.NotificationReminder;
@@ -43,6 +45,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity implements IntefaceListener.acceptFriendRequest
 ,IntefaceListener.declineFriendRequest{
@@ -59,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements IntefaceListener.
     FragmentManager fm;
     private String currentId;
     private DatabaseReference rootRef;
+    FirebaseUser currentUser;
 
 
     @Override
@@ -82,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements IntefaceListener.
 
         // setup firebase auth
         mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        currentId = currentUser.getUid();
 
         // setup view pager
         mViewPager = (ViewPager)findViewById(R.id.viewpager);
@@ -240,6 +246,39 @@ public class MainActivity extends AppCompatActivity implements IntefaceListener.
                     }
                 }
             });
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("test","main start");
+        try {
+            if(currentUser != null && OnlineHelper.isOnForeground(this)){
+                rootRef.child(getString(R.string.users_table))
+                        .child(currentId).child("online").setValue(true);
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("test","main stop");
+        try {
+            if(currentUser != null && !OnlineHelper.isOnForeground(this)) {
+                rootRef.child(getString(R.string.users_table))
+                        .child(currentId).child("online").setValue(false);
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

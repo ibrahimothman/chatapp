@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,6 +30,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.ibra.chatappdemo.R;
 import com.ibra.chatappdemo.dialog.ProgressDialoge;
+import com.ibra.chatappdemo.helper.OnlineHelper;
 import com.ibra.chatappdemo.model.User;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -38,6 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
@@ -59,6 +62,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     private StorageReference thumbRef;
     private String thumbLink,mainImageLink;
     private Bitmap thumbnail_bitmap;
+    FirebaseUser currentUser;
 
 
     @Override
@@ -91,8 +95,8 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
 
 
 
-
-        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        uid = currentUser.getUid();
         mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.users_table)).child(uid);
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -263,6 +267,34 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         return true;
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("test","main start");
+        try {
+            if(currentUser != null && OnlineHelper.isOnForeground(this)){
+                mDatabase.child("online").setValue(true);
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("test","main stop");
+        try {
+            if(currentUser != null && !OnlineHelper.isOnForeground(this)) {
+                mDatabase.child("online").setValue(false);
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }
