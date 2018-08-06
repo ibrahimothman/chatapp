@@ -93,7 +93,7 @@ public class FreindFragment extends Fragment {
                                 userDatabase.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
-                                        if (dataSnapshot != null) {
+                                        if (dataSnapshot != null && getActivity() != null) {
                                             user = dataSnapshot.getValue(User.class);
                                             viewHolder.friendName.setText(user.getuName());
                                             Picasso.get().load(user.getuThumb()).placeholder(R.drawable.thumb_default_image).into(viewHolder.friendImage);

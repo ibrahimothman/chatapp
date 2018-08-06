@@ -31,10 +31,9 @@ public class OnlineHelper extends Application {
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
-        uid = currentUser.getUid();
-
         if(currentUser != null){
             // cuurent user has already signing in before
+            uid = currentUser.getUid();
             userReference = FirebaseDatabase.getInstance().getReference()
                     .child(getString(R.string.users_table)).child(uid);
             userReference.addValueEventListener(new ValueEventListener() {

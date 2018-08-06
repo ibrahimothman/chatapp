@@ -157,7 +157,8 @@ public class ChatActivity extends AppCompatActivity {
         // get friend info
         mRootRef = FirebaseDatabase.getInstance().getReference();
 
-
+        // make message seen when user open chat
+        makeMessageSeen();
 
 
 
@@ -222,7 +223,9 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-
+    private void makeMessageSeen() {
+        mRootRef.child("Chat").child(currentId).child(friendId).child("seen").setValue(true);
+    }
 
 
     private void sendMessage() {

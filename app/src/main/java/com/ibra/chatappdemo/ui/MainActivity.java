@@ -87,7 +87,9 @@ public class MainActivity extends AppCompatActivity implements IntefaceListener.
         // setup firebase auth
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
-        currentId = currentUser.getUid();
+        if(currentUser != null) {
+            currentId = currentUser.getUid();
+        }
 
         // setup view pager
         mViewPager = (ViewPager)findViewById(R.id.viewpager);
