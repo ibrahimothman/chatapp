@@ -9,6 +9,9 @@ chatApp is a social media app where users can chat with their friends
 * Receive a notification if you have new friend request.
 * Receive a notification if you have new message.
 
+# Project Overview
+This project is part of the Android Developer Nanodegree at Udacity.
+
 # ScreenShots
 <p float="left">
 <img width=400 height=680 src="https://user-images.githubusercontent.com/26088754/43352411-4bac37b8-9223-11e8-82bb-74d30f96676c.png">
