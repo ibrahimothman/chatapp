@@ -7,6 +7,7 @@ chatApp is a social media app where users can chat with their friends
 * You can pick up an image from your device to send it.
 * Send friend requests and receive them.
 * Receive a notification if you have new friend request.
+* Receive a notification if you have new message.
 
 
 # Project Overview
