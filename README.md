@@ -1,5 +1,5 @@
 # ChatApp
-chatApp is a social media app where users can chat with their friends
+  ChatApp is a social media app where users can chat with their friends
 
 
 * Find your friends and start shatting with them.
