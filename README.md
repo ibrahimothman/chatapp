@@ -8,6 +8,7 @@
 * Send friend requests and receive them.
 * Receive a notification if you have new friend request.
 * Receive a notification if you have new message.
+* This app uses firebase to store data
 
 
 # Project Overview
