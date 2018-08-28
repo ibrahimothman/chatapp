@@ -6,24 +6,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.LoginActivity"
-    android:background="@android:color/white"
+    android:background="@drawable/backgrpund"
 
     >
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/welcome_statement"
-        android:textSize="24sp"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"/>
+        android:layout_marginTop="102dp"
+        android:background="@drawable/title" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:id="@+id/login_layout"
-        android:paddingTop="350dp"
+        android:paddingTop="250dp"
         android:paddingStart="24dp"
         android:paddingEnd="24dp">
 
@@ -31,25 +31,26 @@
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_login_start"
-            android:layout_width="match_parent"
+            android:layout_width="300dp"
+            android:layout_gravity="center"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
             android:padding="12dp"
-            android:text="@string/already_have_account_button_text"
-            android:background="@color/colorPrimaryDark"
-            android:textColor="@android:color/white"/>
+            android:background="@drawable/have_account"
+            />
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_signup_start"
-            android:layout_width="match_parent"
+            android:layout_width="300dp"
+            android:layout_gravity="center"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="40dp"
             android:layout_marginBottom="24dp"
             android:padding="12dp"
-            android:text="@string/create_an_account_button_text"
-            android:background="@color/colorPrimaryDark"
-            android:textColor="@android:color/white"/>
+
+            android:background="@drawable/create_account"
+            />
 
     </LinearLayout>
 
