@@ -85,9 +85,7 @@
             android:layout_marginTop="@dimen/app_compat_margin_top"
             android:layout_marginBottom="@dimen/app_compat_margin_bottom"
             android:padding="@dimen/app_compat_padding"
-            android:text="@string/create_account_button_text"
-            android:background="@color/colorPrimaryDark"
-            android:textColor="@android:color/white"/>
+            android:background="@drawable/register"/>
 
     </LinearLayout>
 
